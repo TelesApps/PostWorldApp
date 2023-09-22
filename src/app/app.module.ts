@@ -4,6 +4,11 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
+import { environment } from 'src/environments/environment';
+import * as firebase from 'firebase/app';
+
+firebase.initializeApp(environment.firebaseConfig);
+
 @NgModule({
   declarations: [
     AppComponent
