@@ -5,6 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
 import { environment } from 'src/environments/environment';
+import { AngularFireModule } from '@angular/fire/compat';
 import * as firebase from 'firebase/app';
 
 firebase.initializeApp(environment.firebaseConfig);
@@ -15,7 +16,8 @@ firebase.initializeApp(environment.firebaseConfig);
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    AngularFireModule.initializeApp(environment.firebaseConfig),
   ],
   providers: [],
   bootstrap: [AppComponent]
