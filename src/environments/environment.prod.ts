@@ -10,3 +10,8 @@ export const environment = {
         measurementId: "G-W8L40KLFVB"
     },
 };
+
+export const actionCodeSettings = {
+    url: 'https://post-world-app.web.app/main-menu?email-verified',
+    handleCodeInApp: true
+  }

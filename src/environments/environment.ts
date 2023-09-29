@@ -10,3 +10,8 @@ export const environment = {
         measurementId: "G-W8L40KLFVB"
     },
 };
+
+export const actionCodeSettings = {
+    url: 'http://10.0.0.2:4200/',
+    handleCodeInApp: true
+  }

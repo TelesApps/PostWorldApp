@@ -1,1 +1,53 @@
-<p>login works!</p>
+<mat-toolbar class="header" color="primary">
+    <a style="margin-left: 15%;" routerLink="/login"></a>
+</mat-toolbar>
+
+<div *ngIf="!isLoading else loading" class="content">
+    <div style="text-align: left; margin-bottom: 16px;">
+        <mat-slide-toggle>Register A New Account</mat-slide-toggle>
+    </div>
+    <form [formGroup]="loginForm" action="submit">
+        <mat-form-field appearance="fill">
+            <mat-label>email</mat-label>
+            <input type="email" matInput placeholder="username@instnt.com" [formControl]="email" required>
+        </mat-form-field>
+        <div class="error-div-style" *ngIf="email.errors && (email.dirty || email.touched)">
+            <mat-error class="error-msg-style"
+                *ngIf="email.errors && (email.dirty || email.touched) && email.errors['required']">Email is required
+            </mat-error>
+            <mat-error class="error-msg-style"
+                *ngIf="email.errors && (email.dirty || email.touched) && email.errors['pattern']">Sorry, only letters
+                (a-z), numbers (0-9), plus sign (+) and periods (.) are allowed.</mat-error>
+            <mat-error class="error-msg-style"
+                *ngIf="email.errors && (email.dirty || email.touched) && email.errors['maxlength']">Email should not
+                have more than 100 characters ({{ email.errors['maxlength'].actualLength }})</mat-error>
+        </div>
+        <mat-form-field *ngIf="!isResetPassword" appearance="fill">
+            <mat-label>password</mat-label>
+            <input type="password" matInput [formControl]="password" required>
+        </mat-form-field>
+        <div class="error-div-style" *ngIf="password.errors && (password.dirty || password.touched)">
+            <mat-error class="error-msg-style"
+                *ngIf="password.errors && (password.dirty || password.touched) && password.errors['required']">Password
+                is required</mat-error>
+            <mat-error class="error-msg-style"
+                *ngIf="password.errors && (password.dirty || password.touched) && password.errors['pattern']">Must
+                contain at least one number, one uppercase and lowercase letter, one special character and at least 8 or
+                more characters.</mat-error>
+        </div>
+    </form>
+    <button style="width: 100%; height: 50px;" mat-raised-button color="primary" type="Submit"
+        [disabled]="!loginForm.valid" (click)="onLoginSubmit()">Login</button>
+    <hr>
+    <div style="text-align: left;">
+        <mat-slide-toggle [(ngModel)]="isResetPassword" (change)="toggleResetPassword()">I forgot my password
+        </mat-slide-toggle>
+    </div>
+    <hr>
+    <button style="width: 100%; height: 50px;" mat-raised-button color="primary" type="Submit"
+        (click)="onLoginWithGoogle()">Login With Google</button>
+</div>
+
+<ng-template #loading>
+    <mat-spinner color="primary" style="margin: 0 auto; margin-top: 200px;"></mat-spinner>
+</ng-template>
