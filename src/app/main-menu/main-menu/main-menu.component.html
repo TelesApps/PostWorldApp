@@ -1,1 +1,76 @@
-<p>main-menu works!</p>
+<div class="container">
+    <div class="selections">
+        <mat-form-field>
+            <mat-label>Map Size</mat-label>
+            <mat-select [(ngModel)]="mapSize">
+                <mat-option value="tiny">Tiny</mat-option>
+                <mat-option value="small">Small</mat-option>
+                <mat-option value="medium">Medium</mat-option>
+                <mat-option value="large">Large</mat-option>
+                <mat-option value="huge">Huge</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Map Type</mat-label>
+            <mat-select [(ngModel)]="mapType">
+                <mat-option value="pangaea">Pangaea</mat-option>
+                <mat-option value="continents">Continents</mat-option>
+                <mat-option value="archipelago">Archipelago</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Sea Level</mat-label>
+            <mat-select [(ngModel)]="seaLvl">
+                <mat-option value="low">Low</mat-option>
+                <mat-option value="medium">Medium</mat-option>
+                <mat-option value="high">High</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Topography</mat-label>
+            <mat-select [(ngModel)]="hillLvl">
+                <mat-option value="flat">Mostly Flat</mat-option>
+                <mat-option value="average">Average</mat-option>
+                <mat-option value="hills">Lots of Hills</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Forestry</mat-label>
+            <mat-select [(ngModel)]="forestry">
+                <mat-option value="low">Low</mat-option>
+                <mat-option value="medium">Medium</mat-option>
+                <mat-option value="high">High</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Temperature</mat-label>
+            <mat-select [(ngModel)]="temperature">
+                <mat-option value="frozen">Frozen</mat-option>
+                <mat-option value="cold">Cold</mat-option>
+                <mat-option value="temperate">Temperate</mat-option>
+                <mat-option value="hot">Hot</mat-option>
+                <mat-option value="scorching">Scorching</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+            <mat-label>Rain Fall Amount</mat-label>
+            <mat-select [(ngModel)]="rainfall">
+                <mat-option value="sand">Sand</mat-option>
+                <mat-option value="arid">Arid</mat-option>
+                <mat-option value="average">Average</mat-option>
+                <mat-option value="wet">Wet</mat-option>
+                <mat-option value="flooded">Flooded</mat-option>
+            </mat-select>
+        </mat-form-field>
+        <button mat-raised-button color="primary" (click)="onCreateGame()">Create Game</button>
+    </div>
+</div>
+
+<div class="world">
+    <div class="continents" *ngFor="let continents of world.continents">
+        <p>
+            Total Regions: {{ continents.regions.length }}
+        </p>
+        <p>Total Coasts: {{ continents.totalCoasts }}</p>
+    </div>
+</div>

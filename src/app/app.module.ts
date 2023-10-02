@@ -12,6 +12,8 @@ import { InformUserService } from './services/inform-user.service';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthService } from './services/auth.service';
 import { CommonModule } from '@angular/common';
+import { GameCreationService } from './services/game-creation.service';
+import { HexCreationService } from './services/hex-creation.service';
 
 firebase.initializeApp(environment.firebaseConfig);
 
@@ -29,7 +31,9 @@ firebase.initializeApp(environment.firebaseConfig);
   ],
   providers: [
     AuthService,
-    InformUserService
+    InformUserService,
+    GameCreationService,
+    HexCreationService
   ],
   bootstrap: [AppComponent]
 })

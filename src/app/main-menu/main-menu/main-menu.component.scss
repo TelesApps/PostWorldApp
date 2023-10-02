@@ -1,0 +1,54 @@
+.world {
+  display: flex;
+}
+
+.continents {
+  border: 1px solid black;
+  margin: 10px;
+}
+
+.hex-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+}
+
+.hex-row {
+  display: flex;
+  margin-bottom: -25px; /* This will pull the rows closer together vertically */
+}
+
+.hexagon {
+  width: 60px; 
+  height: 57.74px;
+  background-color: #e0e0e0; 
+  margin-left: 1px; /* This will pull the hexagons closer together horizontally */
+  margin-top: 13px;
+  position: relative;
+  border: 1 solid #000000;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  transition: background-color 0.3s ease;
+  p {
+      text-align: center;
+      margin-top: 12px;
+      font-size: 9pt;
+      line-height: 0.6;
+  }
+}
+
+.hex-row:nth-child(even) .hexagon:first-child {
+  margin-left: 31px; /* Ensure the even rows aren't negatively offset too much */
+
+}
+.land {
+  background-color: #4caf50; 
+}
+.mountain {
+  background-color: #9e9e9e; 
+}
+.hill {
+  background-color: #ffeb3b; 
+}
+.river {
+  background-color: #2196f3; 
+}

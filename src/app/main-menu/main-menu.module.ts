@@ -3,6 +3,10 @@ import { CommonModule } from '@angular/common';
 
 import { MainMenuRoutingModule } from './main-menu-routing.module';
 import { MainMenuComponent } from './main-menu/main-menu.component';
+import { FormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import {MatSelectModule} from '@angular/material/select';
+import { MatButtonModule } from '@angular/material/button';
 
 
 @NgModule({
@@ -11,7 +15,11 @@ import { MainMenuComponent } from './main-menu/main-menu.component';
   ],
   imports: [
     CommonModule,
-    MainMenuRoutingModule
+    MainMenuRoutingModule,
+    FormsModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule
   ]
 })
 export class MainMenuModule { }

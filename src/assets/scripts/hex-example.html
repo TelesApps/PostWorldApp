@@ -1,0 +1,10 @@
+<div class="hex-grid">
+    <div *ngFor="let row of hexWorld" class="hex-row">
+        <div *ngFor="let tile of row" class="hexagon"
+            [ngClass]="{'land': tile.isLand, 'mountain': tile.terrainType == 15, 'hill': tile.terrainType == 11, 'river': tile.hasRiverSource}">
+            
+            <p>{{tile.id}}</p>
+            <p>{{ tile.isCostalTile }}</p>
+        </div>
+    </div>
+</div>
