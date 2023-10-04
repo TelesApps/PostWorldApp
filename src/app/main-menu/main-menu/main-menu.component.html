@@ -66,11 +66,24 @@
     </div>
 </div>
 
-<div class="world">
+<div *ngIf="world && world.continents" class="world">
     <div class="continents" *ngFor="let continents of world.continents">
         <p>
             Total Regions: {{ continents.regions.length }}
         </p>
         <p>Total Coasts: {{ continents.totalCoasts }}</p>
+        <p>Total WaterSource {{ continents.totalWaterSources }}</p>
+        <p>yRange: {{ continents.yLocationMin }}, {{ continents.yLocationMax }}</p>
+        <div class="regions">
+            <div *ngFor="let region of continents.regions" class="region" style="margin-top: 10px;">
+                <div><b>Type: {{ region.terrain_type.label }}</b></div>
+                <div>yLocation: {{ region.yLocation }}</div>
+                <div>temp: {{ region.temperatureLvl }}</div>
+                <div>rain: {{ region.rainfallLvl }}</div>
+                <div>water: {{ region.ground_water_amount }}</div>
+                <div>foresrty: {{ region.forestryLvl }}</div>
+
+            </div>
+        </div>
     </div>
 </div>

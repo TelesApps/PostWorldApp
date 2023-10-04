@@ -14,6 +14,8 @@ import { AuthService } from './services/auth.service';
 import { CommonModule } from '@angular/common';
 import { GameCreationService } from './services/game-creation.service';
 import { HexCreationService } from './services/hex-creation.service';
+import { AirtableService } from './services/airtable.service';
+import { HttpClientModule } from '@angular/common/http';
 
 firebase.initializeApp(environment.firebaseConfig);
 
@@ -28,12 +30,14 @@ firebase.initializeApp(environment.firebaseConfig);
     AngularFireModule.initializeApp(environment.firebaseConfig),
     BrowserAnimationsModule,
     MatSnackBarModule,
+    HttpClientModule
   ],
   providers: [
     AuthService,
     InformUserService,
     GameCreationService,
-    HexCreationService
+    HexCreationService,
+    AirtableService,
   ],
   bootstrap: [AppComponent]
 })
