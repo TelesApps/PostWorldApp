@@ -83,12 +83,18 @@ export class GameCreationService {
 
   constructor(private airtabel: AirtableService) { }
 
-  createWorld(mapSize: string, mapType: string, seaLvl: string, hillLvl: string,
+  createWorld(playerId:string, mapSize: string, mapType: string, seaLvl: string, hillLvl: string,
     forestry: string, temperature: string, rainfall: string) {
     return this.airtabel.getTerrainTypes().pipe(map((terrains: TerrainType[]) => {
       console.log('allTerrains', terrains)
-      console.log(JSON.stringify(terrains));
+      // console.log(JSON.stringify(terrains));
       const world: GameWorld = createWorldObj();
+      world.id = playerId + Date.now();
+      world.createdPlayerId = playerId;
+      world.playerIds.push(playerId);
+      world.gameDifficulty = 'normal';
+      world.civilizationIds.push(playerId);
+
       world.mapSize = mapSize;
       world.mapType = mapType;
       world.seaLvl = seaLvl;
@@ -107,24 +113,20 @@ export class GameCreationService {
       this.setRegionWaterAmount(world, forestry, rainfall);
       this.setRegionTerrainType(world, terrains);
       return world;
-
     }));
   }
 
-  setRegionTerrainType(world: GameWorld, terrainList: TerrainType[]) {
+  private setRegionTerrainType(world: GameWorld, terrainList: TerrainType[]) {
+    let randomTerrainByRSICount = 0;
     this.normalizeRSI(terrainList);
     const terrainTotals = this.computeSuggestedTotals(world, terrainList);
     world.totalTerrainTypes = terrainTotals;
     console.log('world', world);
-    console.log(JSON.stringify(world));
-
     let iterations = 0;
-
     for (let continent of world.continents) {
       for (let region of continent.regions) {
         // Filter terrains that can be applied to the current region
         const possibleTerrains = terrainList.filter(terrain => this.isTerrainPossibleForRegion(terrain, region));
-
         // Sort the possible terrains by RSI and how close we are to fulfilling the suggestedTotal
         possibleTerrains.sort((a, b) => {
           const terrainAInfo = world.totalTerrainTypes.get(a.name)!;
@@ -142,8 +144,11 @@ export class GameCreationService {
           const chosenTerrainInfo = world.totalTerrainTypes.get(chosenTerrain.name)!;
           chosenTerrainInfo.count += 1;
         } else {
-          // Default to plains
+          // Default to getting a Random Terrain
           region.terrain_type = this.getRandomTerrainByRSI(terrainList);
+          const randomTerrainInfo = world.totalTerrainTypes.get(region.terrain_type.name)!;
+          randomTerrainInfo.count += 1;
+          randomTerrainByRSICount++
         }
 
         iterations++;
@@ -159,23 +164,11 @@ export class GameCreationService {
         }
       }
     }
-  }
-
-  private getRandomTerrainByRSI(terrainList: TerrainType[]): TerrainType {
-    console.log('FAILURE TO FIND TERRAIN TYPE FOR REGION')
-    // Get a random number between 0 and 100
-    const randomValue = Math.random() * 100;
-
-    let cumulativeProbability = 0;
-    for (const terrain of terrainList) {
-        cumulativeProbability += terrain.terrain_rsi!;
-        if (randomValue <= cumulativeProbability) {
-            return terrain;
-        }
+    if (randomTerrainByRSICount > 0) {
+      console.warn('Number of Regions not assigned by User Selections', randomTerrainByRSICount);
+      console.warn('Total number of Regions', iterations);
     }
-    // In case of an error or unexpected scenario, return the first terrain type (you can change this)
-    return terrainList[0];
-}
+  }
 
   private isTerrainPossibleForRegion(terrain: TerrainType, region: Region): boolean {
     return (
@@ -187,6 +180,20 @@ export class GameCreationService {
       terrain.possible_temperature_lvl.includes(region.temperatureLvl) &&
       terrain.possible_rainfall_lvl.includes(region.rainfallLvl)
     );
+  }
+
+  private getRandomTerrainByRSI(terrainList: TerrainType[]): TerrainType {
+    // Get a random number between 0 and 100
+    const randomValue = Math.random() * 100;
+    let cumulativeProbability = 0;
+    for (const terrain of terrainList) {
+      cumulativeProbability += terrain.terrain_rsi!;
+      if (randomValue <= cumulativeProbability) {
+        return terrain;
+      }
+    }
+    // In case of an error or unexpected scenario, return the first terrain type (you can change this)
+    return terrainList[0];
   }
 
   private normalizeRSI(terrainList: TerrainType[]): void {
@@ -209,7 +216,7 @@ export class GameCreationService {
     return totals;
   }
 
-  setRegionWaterAmount(world: GameWorld, forestry: string, rainfall: string) {
+  private setRegionWaterAmount(world: GameWorld, forestry: string, rainfall: string) {
     const WorldRainLvl = this.getFreshWaterValue(rainfall) * 10; // ranges from 1 to 5
     const baseGroundWater = this.baseGroundWater;
     const groundWaterMultiplier = this.getGroundWaterValue(rainfall);
@@ -247,7 +254,7 @@ export class GameCreationService {
     });
   }
 
-  setRegionForestryLevel(world: GameWorld, forestry: string, rainfall: string) {
+  private setRegionForestryLevel(world: GameWorld, forestry: string, rainfall: string) {
     const WorldRainLvl = this.getFreshWaterValue(rainfall) * 10; // ranges from 1 to 5
     const baseForestryLvl = this.getForestryValue(forestry);
 
@@ -258,6 +265,8 @@ export class GameCreationService {
         const hillLvl = region.hillLvl;
         const hasFreshWater = region.has_fresh_water;
         const hasCoast = region.is_costal_region;
+
+        if (yLocation === 0) console.error('yLocation: ', yLocation);
 
         // Forestry Level Calculation
         // Use baseForestryLvl as the starting point
@@ -318,7 +327,7 @@ export class GameCreationService {
     });
   }
 
-  setTopography(world: GameWorld, hillLvl: string) {
+  private setTopography(world: GameWorld, hillLvl: string) {
     // Gets the total amount of Mountains and Hills in the world map
     const topography = world.totalLand * this.getHillsLvlValue(hillLvl);
     const totalMountain = topography * this.getRandomInclusiveFloat(0.2, 0.35);
@@ -364,13 +373,14 @@ export class GameCreationService {
     });
   }
 
-  setRegionTemperature(continents: Continent[], worldTemperature: number) {
+  private setRegionTemperature(continents: Continent[], worldTemperature: number) {
     continents.forEach(continent => {
       const yLocationMin = continent.yLocationMin;
       const yLocationMax = continent.yLocationMax;
       // Determine the base average temperature level for the continent
       let avgTemp = Math.round((yLocationMin + yLocationMax) / 2);
-      const yLocation = Math.round((yLocationMin + yLocationMax) / 2);
+      let yLocation = Math.round((yLocationMin + yLocationMax) / 2);
+      if (yLocation == 0) yLocation = 1;
       // Adjust the average temperature based on world temperature.
       avgTemp += (worldTemperature - 3); // since 3 is temperate and neutral
       // Ensure avgTemp is within the range [1,5]
@@ -397,6 +407,7 @@ export class GameCreationService {
       tempCounts[avgTemp]++;
       // Assign temperatures to the other regions with a random offset from avgTemp
       for (let i = 0; i < regionCount; i++) {
+        continent.regions[i].yLocation = yLocation;
         if (i === avgTempRegionIdx) continue; // Skip the one we already assigned
 
         const randomOffset = Math.floor(Math.random() * 3) - 1; // random number between -1 and 1
@@ -411,13 +422,12 @@ export class GameCreationService {
         regionTemp = adjustTemperature(regionTemp);
 
         continent.regions[i].temperatureLvl = regionTemp;
-        continent.regions[i].yLocation = yLocation;
         tempCounts[regionTemp]++;
       }
     });
   }
 
-  setWaterSources(world: GameWorld, rainfall: string) {
+  private setWaterSources(world: GameWorld, rainfall: string) {
     let totalWaterSources = this.getFreshWaterValue(rainfall) * world.totalLand;
     let waterSource = 0;
     console.log('totalWaterSources: ', totalWaterSources);
@@ -444,7 +454,7 @@ export class GameCreationService {
     }
   }
 
-  createContinents(world: GameWorld, mapSize: string, mapType: string): Continent[] {
+  private createContinents(world: GameWorld, mapSize: string, mapType: string): Continent[] {
     const numberOfContinents = this.getNumberOfContients(mapSize, mapType);
     const continents: Continent[] = [];
     for (let i = 0; i < numberOfContinents; i++) {
@@ -479,7 +489,7 @@ export class GameCreationService {
     return continents
   }
 
-  createBaseRegionsWithCoasts(world: GameWorld) {
+  private createBaseRegionsWithCoasts(world: GameWorld) {
     const totalNumberOfRegions = world.totalLand;
     let regionCount = 0;
     world.continents.forEach(continent => {
@@ -508,7 +518,7 @@ export class GameCreationService {
     }
   }
 
-  getMapSize(mapSize: string): number {
+  private getMapSize(mapSize: string): number {
     switch (mapSize) {
       case 'tiny':
         return this.tinySize;
@@ -526,7 +536,7 @@ export class GameCreationService {
     return 0;
   }
 
-  getNumberOfContients(mapSize: string, mapType: string): number {
+  private getNumberOfContients(mapSize: string, mapType: string): number {
     if (mapType === 'pangaea') {
       return 1;
     } else if (mapType === 'continents') {
@@ -563,7 +573,7 @@ export class GameCreationService {
     return 0;
   }
 
-  getPercentageOfCoast(mapType: string): number {
+  private getPercentageOfCoast(mapType: string): number {
     switch (mapType) {
       case 'pangaea':
         return this.getRandomInclusiveFloat(this.pangaeaMapLow, this.pangaeaMapHigh);
@@ -575,7 +585,7 @@ export class GameCreationService {
     return 0;
   }
 
-  getSeaLvlValue(seaLvl: string): number {
+  private getSeaLvlValue(seaLvl: string): number {
     switch (seaLvl) {
       case 'low':
         return this.sealLvlLow;
@@ -587,7 +597,7 @@ export class GameCreationService {
     return 0;
   }
 
-  getHillsLvlValue(hillLvl: string): number {
+  private getHillsLvlValue(hillLvl: string): number {
     switch (hillLvl) {
       case 'flat':
         return this.hillsLvlFlat;
@@ -599,7 +609,7 @@ export class GameCreationService {
     return 0;
   }
 
-  getForestryValue(forestry: string): number {
+  private getForestryValue(forestry: string): number {
     switch (forestry) {
       case 'low':
         return this.forestryLow;
@@ -611,7 +621,7 @@ export class GameCreationService {
     return 0;
   }
 
-  getTemperatureValue(temperature: string): number {
+  private getTemperatureValue(temperature: string): number {
     switch (temperature) {
       case 'frozen':
         return this.temperatureFrozen;
@@ -627,7 +637,7 @@ export class GameCreationService {
     return 0;
   }
 
-  getFreshWaterValue(rainfall: string): number {
+  private getFreshWaterValue(rainfall: string): number {
     switch (rainfall) {
       case 'sand':
         return this.freshWaterSand;
@@ -643,7 +653,7 @@ export class GameCreationService {
     return 0;
   }
 
-  getGroundWaterValue(rainfall: string): number {
+  private getGroundWaterValue(rainfall: string): number {
     switch (rainfall) {
       case 'sand':
         return this.groundWaterSand;
@@ -659,11 +669,11 @@ export class GameCreationService {
     return 0;
   }
 
-  getRandomInclusive(min: number, max: number) { // min and max included 
+  private getRandomInclusive(min: number, max: number) { // min and max included 
     return Math.floor(Math.random() * (max - min + 1) + min)
   }
 
-  getRandomInclusiveFloat(min: number, max: number) {
+  private getRandomInclusiveFloat(min: number, max: number) {
     // get a random number between min and max that is less then 1
     const random = Math.random() * (max - min) + min;
     // round the number to 2 decimal places

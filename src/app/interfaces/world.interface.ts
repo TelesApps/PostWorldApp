@@ -1,5 +1,6 @@
 export interface GameWorld {
     id: string;
+    createdPlayerId: string;
     gameDifficulty: string;
     mapSize: string;
     mapType: string;
@@ -20,9 +21,14 @@ export interface GameWorld {
     gameTimeSeconds: number;
 }
 
+export interface GameSettings {
+    
+}
+
 export function createWorldObj(): GameWorld {
     return {
         id: '',
+        createdPlayerId: '',
         gameDifficulty: '',
         mapSize: '',
         mapType: '',
