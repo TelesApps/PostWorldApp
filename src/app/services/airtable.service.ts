@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { AirTableData } from '../interfaces/airtable-data.interface';
 import { Observable, map } from 'rxjs';
-import { TerrainType } from '../interfaces/world.interface';
+import { TerrainType } from '../interfaces/game-world.interface';
 
 @Injectable({
   providedIn: 'root'

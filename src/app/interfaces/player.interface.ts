@@ -19,3 +19,11 @@ export function CreatePlayer(playerId: string, userName?: string, email?: string
         savedGamesId: []
     }
 }
+
+export interface RegionPlayerActivity {
+    regionId: string;
+    playerId: string;
+    is_explored: boolean;
+    is_colonized: boolean;
+    explored_percent: number;
+}

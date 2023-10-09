@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import {
-  GameWorld, Continent, createWorldObj, createContinentsObj,
-  createRegionObj, Region, TerrainType
-} from '../interfaces/world.interface';
+import { GameWorld, createWorldObj, TerrainType } from '../interfaces/game-world.interface';
 import { AirtableService } from './airtable.service';
 import { map, take } from 'rxjs';
 import { SupabaseService } from './supabase.service';
+import { Region, createRegionObj } from '../interfaces/regions.interface';
+import { Continent, createContinentsObj } from '../interfaces/continents.interface';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable({
   providedIn: 'root'
@@ -90,21 +90,21 @@ export class GameCreationService {
       console.log('res from Supabase', terrains);
       // console.log(JSON.stringify(res));
       const world: GameWorld = createWorldObj();
-      world.id = playerId + Date.now();
-      world.createdPlayerId = playerId;
-      world.playerIds.push(playerId);
-      world.gameDifficulty = 'normal';
-      world.civilizationIds.push(playerId);
+      world.id = uuidv4();
+      world.created_player_id = playerId;
+      world.player_ids.push(playerId);
+      world.game_difficulty = 'normal';
+      world.civilization_ids.push(playerId);
 
-      world.mapSize = mapSize;
-      world.mapType = mapType;
-      world.seaLvl = seaLvl;
-      world.hillLvl = hillLvl;
+      world.map_size = mapSize;
+      world.map_type = mapType;
+      world.sea_lvl = seaLvl;
+      world.hill_lvl = hillLvl;
       world.forestry = forestry;
       world.temperature = temperature;
       world.rainfall = rainfall;
-      world.totalLand = this.getMapSize(mapSize) * (1 - this.getSeaLvlValue(seaLvl));
-      world.totalOcean = this.getMapSize(mapSize) * this.getSeaLvlValue(seaLvl);
+      world.total_land = this.getMapSize(mapSize) * (1 - this.getSeaLvlValue(seaLvl));
+      world.total_ocean = this.getMapSize(mapSize) * this.getSeaLvlValue(seaLvl);
       world.continents = this.createContinents(world, mapSize, mapType);
       this.createBaseRegionsWithCoasts(world);
       this.setWaterSources(world, rainfall);
@@ -151,7 +151,7 @@ export class GameCreationService {
     let randomTerrainByRSICount = 0;
     this.normalizeRSI(terrainList);
     const terrainTotals = this.computeSuggestedTotals(world, terrainList);
-    world.totalTerrainTypes = terrainTotals;
+    world.total_terrain_types = terrainTotals;
     console.log('world', world);
     let iterations = 0;
     for (let continent of world.continents) {
@@ -160,8 +160,8 @@ export class GameCreationService {
         const possibleTerrains = terrainList.filter(terrain => this.isTerrainPossibleForRegion(terrain, region));
         // Sort the possible terrains by RSI and how close we are to fulfilling the suggestedTotal
         possibleTerrains.sort((a, b) => {
-          const terrainAInfo = world.totalTerrainTypes.get(a.name)!;
-          const terrainBInfo = world.totalTerrainTypes.get(b.name)!;
+          const terrainAInfo = world.total_terrain_types.get(a.name)!;
+          const terrainBInfo = world.total_terrain_types.get(b.name)!;
           const differenceA = terrainAInfo.suggestedTotal - terrainAInfo.count;
           const differenceB = terrainBInfo.suggestedTotal - terrainBInfo.count;
 
@@ -172,12 +172,12 @@ export class GameCreationService {
         if (possibleTerrains.length) {
           const chosenTerrain = possibleTerrains[0];
           region.terrain_type = chosenTerrain;
-          const chosenTerrainInfo = world.totalTerrainTypes.get(chosenTerrain.name)!;
+          const chosenTerrainInfo = world.total_terrain_types.get(chosenTerrain.name)!;
           chosenTerrainInfo.count += 1;
         } else {
           // Default to getting a Random Terrain
           region.terrain_type = this.getRandomTerrainByRSI(terrainList);
-          const randomTerrainInfo = world.totalTerrainTypes.get(region.terrain_type.name)!;
+          const randomTerrainInfo = world.total_terrain_types.get(region.terrain_type.name)!;
           randomTerrainInfo.count += 1;
           randomTerrainByRSICount++
         }
@@ -186,7 +186,7 @@ export class GameCreationService {
 
         // Rebalancing if necessary
         if (iterations > 2000) {
-          for (let [terrainName, terrainInfo] of world.totalTerrainTypes.entries()) {
+          for (let [terrainName, terrainInfo] of world.total_terrain_types.entries()) {
             if (terrainInfo.count < terrainInfo.suggestedTotal) {
               region.terrain_type = terrainList.find(terrain => terrain.name === terrainName)!;
               terrainInfo.count += 1;
@@ -240,7 +240,7 @@ export class GameCreationService {
     const totals = new Map<string, { suggestedTotal: number, count: number }>();
     terrainList.forEach(terrain => {
       if (terrain.terrain_rsi !== undefined) {
-        const suggestedTotal = Math.ceil((terrain.terrain_rsi / 100) * world.totalLand);
+        const suggestedTotal = Math.ceil((terrain.terrain_rsi / 100) * world.total_land);
         totals.set(terrain.name, { suggestedTotal, count: 0 });
       }
     });
@@ -360,15 +360,15 @@ export class GameCreationService {
 
   private setTopography(world: GameWorld, hillLvl: string) {
     // Gets the total amount of Mountains and Hills in the world map
-    const topography = world.totalLand * this.getHillsLvlValue(hillLvl);
+    const topography = world.total_land * this.getHillsLvlValue(hillLvl);
     const totalMountain = topography * this.getRandomInclusiveFloat(0.2, 0.35);
     const totalHills: number = topography - totalMountain;
     // Distribute mountains and hills to continents based on their size
     world.continents.forEach(continent => {
       const regionCount = continent.regions.length;
       // Assign proportionate mountains and hills to this continent
-      const continentMountains = Math.round((regionCount / world.totalLand) * totalMountain);
-      const continentHills = Math.round((regionCount / world.totalLand) * totalHills);
+      const continentMountains = Math.round((regionCount / world.total_land) * totalMountain);
+      const continentHills = Math.round((regionCount / world.total_land) * totalHills);
 
       let assignedMountains = 0;
       let assignedHills = 0;
@@ -459,10 +459,8 @@ export class GameCreationService {
   }
 
   private setWaterSources(world: GameWorld, rainfall: string) {
-    let totalWaterSources = this.getFreshWaterValue(rainfall) * world.totalLand;
+    let totalWaterSources = this.getFreshWaterValue(rainfall) * world.total_land;
     let waterSource = 0;
-    console.log('totalWaterSources: ', totalWaterSources);
-    console.log('world.totalLand: ', world.totalLand);
     while (waterSource < totalWaterSources) {
       // get a random continent
       const continentIndex = this.getRandomInclusive(0, world.continents.length - 1);
@@ -490,8 +488,9 @@ export class GameCreationService {
     const continents: Continent[] = [];
     for (let i = 0; i < numberOfContinents; i++) {
       let continent: Continent = createContinentsObj();
+      continent.id = uuidv4();
       continent.world_id = world.id;
-      continent.continent_id = i.toString();
+      continent.continent_number = i.toString();
       continent.yLocationMin = this.getRandomInclusive(1, 5);
       continent.yLocationMax = this.getRandomInclusive(1, 5);
       if (continent.yLocationMin > continent.yLocationMax) {
@@ -503,7 +502,7 @@ export class GameCreationService {
     }
     // Sets the total number of coasts each continent has
     const coastPercent = this.getPercentageOfCoast(mapType);
-    const totalNumberOfCoasts = world.totalLand * coastPercent;
+    const totalNumberOfCoasts = world.total_land * coastPercent;
     let coastNumber = 0;
     // assures that every continent gets at least 1 coast
     continents.forEach(continent => {
@@ -521,15 +520,15 @@ export class GameCreationService {
   }
 
   private createBaseRegionsWithCoasts(world: GameWorld) {
-    const totalNumberOfRegions = world.totalLand;
+    const totalNumberOfRegions = world.total_land;
     let regionCount = 0;
     world.continents.forEach(continent => {
       // For each continent create all costal regions
       for (let index = 0; index < continent.totalCoasts; index++) {
         const region = createRegionObj();
         region.world_id = world.id;
-        region.continent_id = continent.continent_id;
-        region.id = regionCount.toString();
+        region.continent_id = continent.continent_number;
+        region.id = uuidv4();
         region.is_costal_region = true;
         continent.regions.push(region);
         regionCount++;
@@ -542,8 +541,8 @@ export class GameCreationService {
       const continent = world.continents[continentIndex];
       const region = createRegionObj();
       region.world_id = world.id;
-      region.continent_id = continent.continent_id;
-      region.id = regionCount.toString();
+      region.continent_id = continent.continent_number;
+      region.id = uuidv4();
       continent.regions.push(region);
       regionCount++;
     }

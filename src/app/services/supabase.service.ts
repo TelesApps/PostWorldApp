@@ -9,7 +9,7 @@ import {
 } from '@supabase/supabase-js'
 import { environment } from 'src/environments/environment'
 import { SupabaseData } from '../interfaces/supabase-data.interface';
-import { TerrainType } from '../interfaces/world.interface';
+import { GameWorld, TerrainType } from '../interfaces/game-world.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -30,4 +30,5 @@ export class SupabaseService {
   async getAllTerrainTypes(): Promise<TerrainType[]> {
     return (await this.supabase.from('Terrain Types').select('*')).data;
   }
+
 }

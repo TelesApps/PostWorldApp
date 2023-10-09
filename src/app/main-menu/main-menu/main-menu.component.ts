@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { take } from 'rxjs';
 import { Tile } from 'src/app/interfaces/hex-tile.interface';
 import { Player } from 'src/app/interfaces/player.interface';
-import { GameWorld } from 'src/app/interfaces/world.interface';
+import { GameWorld } from 'src/app/interfaces/game-world.interface';
 import { AuthService } from 'src/app/services/auth.service';
 import { GameCreationService } from 'src/app/services/game-creation.service';
 import { HexCreationService } from 'src/app/services/hex-creation.service';
