@@ -16,6 +16,7 @@ import { GameCreationService } from './services/game-creation.service';
 import { HexCreationService } from './services/hex-creation.service';
 import { AirtableService } from './services/airtable.service';
 import { HttpClientModule } from '@angular/common/http';
+import { SupabaseService } from './services/supabase.service';
 
 firebase.initializeApp(environment.firebaseConfig);
 
@@ -38,6 +39,7 @@ firebase.initializeApp(environment.firebaseConfig);
     GameCreationService,
     HexCreationService,
     AirtableService,
+    SupabaseService
   ],
   bootstrap: [AppComponent]
 })

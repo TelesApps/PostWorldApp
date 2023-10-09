@@ -7,6 +7,7 @@ import { AuthService } from 'src/app/services/auth.service';
 import { GameCreationService } from 'src/app/services/game-creation.service';
 import { HexCreationService } from 'src/app/services/hex-creation.service';
 import { NeonDataService } from 'src/app/services/neon-data.service';
+import { SupabaseService } from 'src/app/services/supabase.service';
 
 @Component({
   selector: 'app-main-menu',
@@ -26,7 +27,7 @@ export class MainMenuComponent implements OnInit {
   player: Player;
   world: GameWorld;
 
-  constructor(private GC: GameCreationService, private auth: AuthService, private neon: NeonDataService) { }
+  constructor(private GC: GameCreationService, private auth: AuthService, private neon: NeonDataService, private SB: SupabaseService) { }
 
 
   ngOnInit() {
@@ -35,19 +36,28 @@ export class MainMenuComponent implements OnInit {
   }
 
   onCreateGame() {
-    this.neon.getData().subscribe((data: any) => {
-      console.log('got data from http call');
-      console.log(data);
-    })
-    // if (this.player) {
-    //   this.GC.createWorld(this.player.playerId, this.mapSize, this.mapType, this.seaLvl,
-    //     this.hillLvl, this.forestry, this.temperature, this.rainfall).pipe(take(1)).subscribe(world => {
-    //       this.world = world;
-    //       console.log(this.world);
-    //     });
-    // } else {
-    //   console.error('No player logged in');
-    // }
+
+    // this.SB.getAllTerrainTypes().then((data) => {
+    //   console.log('data from Supabase', data);
+    // });
+
+
+    // this.neon.getData().subscribe((data: any) => {
+    //   console.log('got data from http call');
+    //   console.log(data);
+    // });
+
+
+    if (this.player) {
+      this.GC.createWorld(this.player.playerId, this.mapSize, this.mapType, this.seaLvl,
+        this.hillLvl, this.forestry, this.temperature, this.rainfall).then((world) => {
+          this.world = world;
+          console.log(this.world);
+        });
+
+    } else {
+      console.error('No player logged in');
+    }
     // this.hexWorld = this.HX.createWorld(this.mapSize, this.mapType, this.seaLvl);
   }
 

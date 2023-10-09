@@ -5,6 +5,7 @@ import {
 } from '../interfaces/world.interface';
 import { AirtableService } from './airtable.service';
 import { map, take } from 'rxjs';
+import { SupabaseService } from './supabase.service';
 
 @Injectable({
   providedIn: 'root'
@@ -81,13 +82,13 @@ export class GameCreationService {
 
   terrainTypeList: TerrainType[] = [];
 
-  constructor(private airtabel: AirtableService) { }
+  constructor(private airtabel: AirtableService, private supabase: SupabaseService) { }
 
-  createWorld(playerId:string, mapSize: string, mapType: string, seaLvl: string, hillLvl: string,
+  createWorld(playerId: string, mapSize: string, mapType: string, seaLvl: string, hillLvl: string,
     forestry: string, temperature: string, rainfall: string) {
-    return this.airtabel.getTerrainTypes().pipe(map((terrains: TerrainType[]) => {
-      console.log('allTerrains', terrains)
-      // console.log(JSON.stringify(terrains));
+    return this.supabase.getAllTerrainTypes().then((terrains) => {
+      console.log('res from Supabase', terrains);
+      // console.log(JSON.stringify(res));
       const world: GameWorld = createWorldObj();
       world.id = playerId + Date.now();
       world.createdPlayerId = playerId;
@@ -113,7 +114,37 @@ export class GameCreationService {
       this.setRegionWaterAmount(world, forestry, rainfall);
       this.setRegionTerrainType(world, terrains);
       return world;
-    }));
+
+    });
+    // return this.airtabel.getTerrainTypes().pipe(map((terrains: TerrainType[]) => {
+    //   console.log('data from airtable', terrains)
+    //   // console.log(JSON.stringify(terrains));
+    //   const world: GameWorld = createWorldObj();
+    //   world.id = playerId + Date.now();
+    //   world.createdPlayerId = playerId;
+    //   world.playerIds.push(playerId);
+    //   world.gameDifficulty = 'normal';
+    //   world.civilizationIds.push(playerId);
+
+    //   world.mapSize = mapSize;
+    //   world.mapType = mapType;
+    //   world.seaLvl = seaLvl;
+    //   world.hillLvl = hillLvl;
+    //   world.forestry = forestry;
+    //   world.temperature = temperature;
+    //   world.rainfall = rainfall;
+    //   world.totalLand = this.getMapSize(mapSize) * (1 - this.getSeaLvlValue(seaLvl));
+    //   world.totalOcean = this.getMapSize(mapSize) * this.getSeaLvlValue(seaLvl);
+    //   world.continents = this.createContinents(world, mapSize, mapType);
+    //   this.createBaseRegionsWithCoasts(world);
+    //   this.setWaterSources(world, rainfall);
+    //   this.setTopography(world, hillLvl);
+    //   this.setRegionTemperature(world.continents, this.getTemperatureValue(temperature));
+    //   this.setRegionForestryLevel(world, forestry, rainfall);
+    //   this.setRegionWaterAmount(world, forestry, rainfall);
+    //   this.setRegionTerrainType(world, terrains);
+    //   return world;
+    // }));
   }
 
   private setRegionTerrainType(world: GameWorld, terrainList: TerrainType[]) {
