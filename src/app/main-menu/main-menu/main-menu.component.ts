@@ -8,6 +8,8 @@ import { GameCreationService } from 'src/app/services/game-creation.service';
 import { HexCreationService } from 'src/app/services/hex-creation.service';
 import { NeonDataService } from 'src/app/services/neon-data.service';
 import { SupabaseService } from 'src/app/services/supabase.service';
+import { FirebaseService } from 'src/app/services/firebase.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-main-menu',
@@ -27,7 +29,7 @@ export class MainMenuComponent implements OnInit {
   player: Player;
   world: GameWorld;
 
-  constructor(private GC: GameCreationService, private auth: AuthService, private neon: NeonDataService, private SB: SupabaseService) { }
+  constructor(private GC: GameCreationService, private auth: AuthService, private firebase: FirebaseService, private router: Router) { }
 
 
   ngOnInit() {
@@ -37,28 +39,19 @@ export class MainMenuComponent implements OnInit {
 
   onCreateGame() {
 
-    // this.SB.getAllTerrainTypes().then((data) => {
-    //   console.log('data from Supabase', data);
-    // });
-
-
-    // this.neon.getData().subscribe((data: any) => {
-    //   console.log('got data from http call');
-    //   console.log(data);
-    // });
-
-
     if (this.player) {
-      this.GC.createWorld(this.player.playerId, this.mapSize, this.mapType, this.seaLvl,
+      this.GC.createWorld(this.player, this.mapSize, this.mapType, this.seaLvl,
         this.hillLvl, this.forestry, this.temperature, this.rainfall).then((world) => {
           this.world = world;
-          console.log(this.world);
+          console.log('game world created', this.world);
+          this.firebase.saveGame(world).then(() => {
+            this.router.navigate(['/game']);
+          });
         });
 
     } else {
       console.error('No player logged in');
     }
-    // this.hexWorld = this.HX.createWorld(this.mapSize, this.mapType, this.seaLvl);
   }
 
 

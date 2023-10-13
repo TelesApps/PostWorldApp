@@ -1,29 +1,19 @@
 export interface Player {
-    playerId: string;
-    playerStatus: 'visitor' | 'player';
-    userName: string;
+    player_id: string;
+    player_status: 'visitor' | 'player';
+    user_name: string;
     email: string;
-    emailVerified: boolean;
-    photoUrl?: string;
-    savedGamesId: string[];
+    is_email_verified: boolean;
+    photo_url?: string;
 }
 
 export function CreatePlayer(playerId: string, userName?: string, email?: string, emailVerified?: boolean, photoUrl?: string): Player {
     return {
-        playerId: playerId,
-        playerStatus: 'visitor',
-        userName: userName || '',
+        player_id: playerId,
+        player_status: 'visitor',
+        user_name: userName || '',
         email: email || '',
-        emailVerified: emailVerified || false,
-        photoUrl: photoUrl,
-        savedGamesId: []
+        is_email_verified: emailVerified || false,
+        photo_url: photoUrl,
     }
-}
-
-export interface RegionPlayerActivity {
-    regionId: string;
-    playerId: string;
-    is_explored: boolean;
-    is_colonized: boolean;
-    explored_percent: number;
 }

@@ -102,9 +102,9 @@ export class HexCreationService {
     // Set the first few to be mountains, and the rest to be hills
     for (let i = 0; i < numToChange; i++) {
       if (i < numToChange * 0.3) {  // You can adjust this ratio
-        landTiles[i].terrainType = TerrainType.Mountain;
+        landTiles[i].terrainType = TerrainType.mountains;
       } else {
-        landTiles[i].terrainType = TerrainType.Hill;
+        landTiles[i].terrainType = TerrainType.hills;
       }
     }
   }
@@ -132,7 +132,7 @@ export class HexCreationService {
           x: x,
           y: y,
           id: `${x}-${y}`,
-          terrainType: TerrainType.Ocean,
+          terrainType: TerrainType.ocean,
           isLand: noise > threshold,
           hasRiverSource: false,
           isCostalTile: false,

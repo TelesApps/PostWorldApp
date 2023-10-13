@@ -6,6 +6,8 @@ import { SupabaseService } from './supabase.service';
 import { Region, createRegionObj } from '../interfaces/regions.interface';
 import { Continent, createContinentsObj } from '../interfaces/continents.interface';
 import { v4 as uuidv4 } from 'uuid';
+import { FirebaseService } from './firebase.service';
+import { Player } from '../interfaces/player.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -84,17 +86,15 @@ export class GameCreationService {
 
   constructor(private airtabel: AirtableService, private supabase: SupabaseService) { }
 
-  createWorld(playerId: string, mapSize: string, mapType: string, seaLvl: string, hillLvl: string,
+  createWorld(player: Player, mapSize: string, mapType: string, seaLvl: string, hillLvl: string,
     forestry: string, temperature: string, rainfall: string) {
     return this.supabase.getAllTerrainTypes().then((terrains) => {
       console.log('res from Supabase', terrains);
       // console.log(JSON.stringify(res));
       const world: GameWorld = createWorldObj();
-      world.id = uuidv4();
-      world.created_player_id = playerId;
-      world.player_ids.push(playerId);
+      world.id = player.email + Date.now();
+      world.created_player_id = player.player_id;
       world.game_difficulty = 'normal';
-      world.civilization_ids.push(playerId);
 
       world.map_size = mapSize;
       world.map_type = mapType;
@@ -205,11 +205,11 @@ export class GameCreationService {
     return (
       terrain.is_possible_in_coast === region.is_costal_region &&
       terrain.is_possible_with_fresh_water === region.has_fresh_water &&
-      terrain.possible_ylocations.includes(region.yLocation) &&
-      terrain.possible_hill_lvl.includes(region.hillLvl) &&
-      terrain.possible_forestry_lvl.includes(region.forestryLvl) &&
-      terrain.possible_temperature_lvl.includes(region.temperatureLvl) &&
-      terrain.possible_rainfall_lvl.includes(region.rainfallLvl)
+      terrain.possible_ylocations.includes(region.ylocation) &&
+      terrain.possible_hill_lvl.includes(region.hill_lvl) &&
+      terrain.possible_forestry_lvl.includes(region.forestry_lvl) &&
+      terrain.possible_temperature_lvl.includes(region.temperature_lvl) &&
+      terrain.possible_rainfall_lvl.includes(region.rainfall_lvl)
     );
   }
 
@@ -255,9 +255,9 @@ export class GameCreationService {
 
     world.continents.forEach(continent => {
       continent.regions.forEach(region => {
-        const yLocation = region.yLocation;
-        const temperature = region.temperatureLvl;
-        const hillLvl = region.hillLvl;
+        const yLocation = region.ylocation;
+        const temperature = region.temperature_lvl;
+        const hillLvl = region.hill_lvl;
         const hasFreshWater = region.has_fresh_water;
         const hasCoast = region.is_costal_region;
 
@@ -271,7 +271,7 @@ export class GameCreationService {
 
         rainFactor = Math.max(1, Math.min(5, Math.round(rainFactor))); // Ensuring rainFactor stays between 1 and 5
 
-        region.rainfallLvl = rainFactor;
+        region.rainfall_lvl = rainFactor;
 
         // Ground Water Calculation
         let groundWaterFactor = baseGroundWater
@@ -291,9 +291,9 @@ export class GameCreationService {
 
     world.continents.forEach(continent => {
       continent.regions.forEach(region => {
-        const yLocation = region.yLocation;
-        const temperature = region.temperatureLvl;
-        const hillLvl = region.hillLvl;
+        const yLocation = region.ylocation;
+        const temperature = region.temperature_lvl;
+        const hillLvl = region.hill_lvl;
         const hasFreshWater = region.has_fresh_water;
         const hasCoast = region.is_costal_region;
 
@@ -301,28 +301,28 @@ export class GameCreationService {
 
         // Forestry Level Calculation
         // Use baseForestryLvl as the starting point
-        region.forestryLvl = baseForestryLvl;
+        region.forestry_lvl = baseForestryLvl;
 
         // Adjustments based on temperature and rainfall
         if (temperature >= 4 && WorldRainLvl >= 3) {
-          region.forestryLvl += 1;
+          region.forestry_lvl += 1;
         } else if (temperature <= 2 || WorldRainLvl <= 2) {
-          region.forestryLvl -= 1;
+          region.forestry_lvl -= 1;
         }
 
         // Slight adjustments for yLocation and hills
         if (yLocation <= 2) {
-          region.forestryLvl -= 0.5;
+          region.forestry_lvl -= 0.5;
         } else if (yLocation >= 4) {
-          region.forestryLvl += 0.5;
+          region.forestry_lvl += 0.5;
         }
 
         if (hillLvl > 0) {
-          region.forestryLvl -= 0.5;
+          region.forestry_lvl -= 0.5;
         }
 
         // Ensure forestryLvl stays within the range [1, 3]
-        region.forestryLvl = Math.max(1, Math.min(3, region.forestryLvl));
+        region.forestry_lvl = Math.max(1, Math.min(3, region.forestry_lvl));
 
         // (Rest of the code remains unchanged...)
 
@@ -331,7 +331,7 @@ export class GameCreationService {
       // Check for variation and adjust
       let forestryCounts: { [key: number]: number } = { 1: 0, 2: 0, 3: 0 };
       continent.regions.forEach(region => {
-        forestryCounts[region.forestryLvl]++;
+        forestryCounts[region.forestry_lvl]++;
       });
 
       const threshold = continent.regions.length * 0.6;  // adjust this threshold as needed
@@ -342,9 +342,9 @@ export class GameCreationService {
           // We need more variation
           let adjusted = 0;
           for (let region of continent.regions) {
-            if (region.forestryLvl === level && adjusted < threshold / 4) {  // adjust a quarter, can be tweaked
-              if (level === 1) region.forestryLvl += 1;
-              else if (level === 3) region.forestryLvl -= 1;
+            if (region.forestry_lvl === level && adjusted < threshold / 4) {  // adjust a quarter, can be tweaked
+              if (level === 1) region.forestry_lvl += 1;
+              else if (level === 3) region.forestry_lvl -= 1;
               adjusted++;
             }
           }
@@ -353,7 +353,7 @@ export class GameCreationService {
 
       // Adjust Region.forestryLvl to whole numbers
       continent.regions.forEach(region => {
-        region.forestryLvl = Math.round(region.forestryLvl);
+        region.forestry_lvl = Math.round(region.forestry_lvl);
       });
     });
   }
@@ -377,8 +377,8 @@ export class GameCreationService {
         // Randomly select a region as the starting point for a mountain range
         const startIdx = Math.floor(Math.random() * regionCount);
 
-        if (continent.regions[startIdx].hillLvl === 0) {
-          continent.regions[startIdx].hillLvl = 2;  // Set as mountain
+        if (continent.regions[startIdx].hill_lvl === 0) {
+          continent.regions[startIdx].hill_lvl = 2;  // Set as mountain
           assignedMountains++;
 
           // Create range around this mountain. The range can be 2-4 regions.
@@ -386,8 +386,8 @@ export class GameCreationService {
 
           for (let i = 1; i < rangeSize; i++) {
             const nextIdx = startIdx + i < regionCount ? startIdx + i : startIdx - i;
-            if (continent.regions[nextIdx].hillLvl === 0 && assignedHills < continentHills) {
-              continent.regions[nextIdx].hillLvl = 1;  // Set as hill
+            if (continent.regions[nextIdx].hill_lvl === 0 && assignedHills < continentHills) {
+              continent.regions[nextIdx].hill_lvl = 1;  // Set as hill
               assignedHills++;
             }
           }
@@ -396,8 +396,8 @@ export class GameCreationService {
       // Fill in remaining hills (outside of ranges)
       while (assignedHills < continentHills) {
         const hillIdx = Math.floor(Math.random() * regionCount);
-        if (continent.regions[hillIdx].hillLvl === 0) {
-          continent.regions[hillIdx].hillLvl = 1;  // Set as hill
+        if (continent.regions[hillIdx].hill_lvl === 0) {
+          continent.regions[hillIdx].hill_lvl = 1;  // Set as hill
           assignedHills++;
         }
       }
@@ -434,17 +434,17 @@ export class GameCreationService {
       };
       // Assign temperatures to regions, ensuring at least one region gets avgTemp
       const avgTempRegionIdx = Math.floor(Math.random() * regionCount);
-      continent.regions[avgTempRegionIdx].temperatureLvl = avgTemp;
+      continent.regions[avgTempRegionIdx].temperature_lvl = avgTemp;
       tempCounts[avgTemp]++;
       // Assign temperatures to the other regions with a random offset from avgTemp
       for (let i = 0; i < regionCount; i++) {
-        continent.regions[i].yLocation = yLocation;
+        continent.regions[i].ylocation = yLocation;
         if (i === avgTempRegionIdx) continue; // Skip the one we already assigned
 
         const randomOffset = Math.floor(Math.random() * 3) - 1; // random number between -1 and 1
         let regionTemp = avgTemp + randomOffset;
         // Lower the temperature by the hillLvl of the region
-        regionTemp -= continent.regions[i].hillLvl;
+        regionTemp -= continent.regions[i].hill_lvl;
 
         // Ensure regionTemp is within the range [1,5]
         regionTemp = Math.max(1, Math.min(5, regionTemp));
@@ -452,7 +452,7 @@ export class GameCreationService {
         // Adjust temperature if the count of this temp exceeds a threshold
         regionTemp = adjustTemperature(regionTemp);
 
-        continent.regions[i].temperatureLvl = regionTemp;
+        continent.regions[i].temperature_lvl = regionTemp;
         tempCounts[regionTemp]++;
       }
     });
@@ -498,6 +498,7 @@ export class GameCreationService {
         continent.yLocationMin = continent.yLocationMax;
         continent.yLocationMax = temp;
       }
+      world.continent_ids.push(continent.id);
       continents.push(continent);
     }
     // Sets the total number of coasts each continent has

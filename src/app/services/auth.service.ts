@@ -21,6 +21,7 @@ export class AuthService {
       if (user) {
         return this.afs.doc<Player>(`players/${user.uid}`).valueChanges();
       } else {
+        this.router.navigate(['/login']);
         return of(null);
       }
     })))
@@ -42,7 +43,7 @@ export class AuthService {
       const authUser = await this.afAuth.currentUser;
       if (authUser) {
         let user = CreatePlayer(authUser.uid, authUser.displayName, authUser.email, authUser.emailVerified, authUser.photoURL);
-        user.userName = userName;
+        user.user_name = userName;
         this.updatePlayerData(user);
         return authUser.sendEmailVerification(actionCodeSettings);
       } else {
@@ -95,8 +96,8 @@ export class AuthService {
             this.router.navigate(['/']);
             return this.updatePlayerData(userData);
           } else {
-            if (user.photoUrl === '' && credential.user.photoURL !== '') {
-              user.photoUrl = credential.user.photoURL;
+            if (user.photo_url === '' && credential.user.photoURL !== '') {
+              user.photo_url = credential.user.photoURL;
               this.updatePlayerData(user);
             }
             this.router.navigate(['/']);
@@ -108,7 +109,7 @@ export class AuthService {
 
   // Update User information in Firebase Database
   updatePlayerData(playerData: Player) {
-    const docRef: AngularFirestoreDocument<any> = this.afs.doc(`players/${playerData.playerId}`);
+    const docRef: AngularFirestoreDocument<any> = this.afs.doc(`players/${playerData.player_id}`);
     return docRef.set(playerData, { merge: true });
   }
 

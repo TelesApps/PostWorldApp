@@ -16,9 +16,9 @@ export interface GameWorld {
     total_land: number;
     total_ocean: number;
     total_terrain_types: Map<string, {suggestedTotal: number, count: number}>;
-    continents: Continent[];
-    player_ids: string[];
-    civilization_ids: string[];
+    total_terrain_types_json?: {};
+    continent_ids: string[];
+    continents?: Continent[];
     creation_date: Date;
     current_date: Date;
     game_speed_multiplier: number;
@@ -46,9 +46,9 @@ export function createWorldObj(): GameWorld {
         total_land: 0,
         total_ocean: 0,
         total_terrain_types: new Map(),
+        total_terrain_types_json: {},
+        continent_ids: [],
         continents: [],
-        player_ids: [],
-        civilization_ids: [],
         creation_date: new Date(),
         current_date: new Date(),
         game_speed_multiplier: 0,

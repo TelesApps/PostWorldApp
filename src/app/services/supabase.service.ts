@@ -31,4 +31,14 @@ export class SupabaseService {
     return (await this.supabase.from('Terrain Types').select('*')).data;
   }
 
+  addRow() {
+    this.supabase
+      .from('Resource Library')
+      .insert([
+        { some_column: 'someValue', other_column: 'otherValue' },
+      ])
+      .select()
+
+  }
+
 }

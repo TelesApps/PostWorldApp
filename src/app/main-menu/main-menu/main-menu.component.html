@@ -77,11 +77,11 @@
         <div class="regions">
             <div *ngFor="let region of continents.regions" class="region" style="margin-top: 10px;">
                 <div><b>Type: {{ region.terrain_type.label }}</b></div>
-                <div>yLocation: {{ region.yLocation }}</div>
-                <div>temp: {{ region.temperatureLvl }}</div>
-                <div>rain: {{ region.rainfallLvl }}</div>
+                <div>yLocation: {{ region.ylocation }}</div>
+                <div>temp: {{ region.temperature_lvl }}</div>
+                <div>rain: {{ region.rainfall_lvl }}</div>
                 <div>water: {{ region.ground_water_amount }}</div>
-                <div>foresrty: {{ region.forestryLvl }}</div>
+                <div>foresrty: {{ region.forestry_lvl }}</div>
 
             </div>
         </div>
