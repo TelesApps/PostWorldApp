@@ -3,8 +3,9 @@ import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/compat
 import { GameWorld } from '../interfaces/game-world.interface';
 import { lastValueFrom } from 'rxjs';
 import { Continent } from '../interfaces/continents.interface';
-import { Region, RegionPlayerActivity } from '../interfaces/regions.interface';
-import { Building, Colonist } from '../interfaces/colony.interface';
+import { Party, Region, RegionPlayerActivity } from '../interfaces/regions.interface';
+import { Building } from '../interfaces/colony.interface';
+import { Colonist } from '../interfaces/colonist.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -33,21 +34,25 @@ export class FirebaseService {
         const gameWorld = docSnap.data() as GameWorld;
 
         return Promise.all([
+          // Switch all of these .toPromise() to lastValueFrom()
           // Fetch all related continents
-          this.afs.collection('continents', ref => ref.where('world_id', '==', gameWorldId)).get().toPromise(),
+          lastValueFrom(this.afs.collection('continents', ref => ref.where('world_id', '==', gameWorldId)).get()),
           // Fetch all related regions
-          this.afs.collection('regions', ref => ref.where('world_id', '==', gameWorldId)).get().toPromise(),
+          lastValueFrom(this.afs.collection('regions', ref => ref.where('world_id', '==', gameWorldId)).get()),
           // Fetch all related player activities
-          this.afs.collection('player_activities', ref => ref.where('world_id', '==', gameWorldId)).get().toPromise(),
+          lastValueFrom(this.afs.collection('players_activity', ref => ref.where('world_id', '==', gameWorldId)).get()),
+          // Fetch all related parties
+          lastValueFrom(this.afs.collection('parties', ref => ref.where('world_id', '==', gameWorldId)).get()),
           // Fetch all related buildings
-          this.afs.collection('buildings', ref => ref.where('world_id', '==', gameWorldId)).get().toPromise(),
+          lastValueFrom(this.afs.collection('buildings', ref => ref.where('world_id', '==', gameWorldId)).get()),
           // Fetch all related colonists
-          this.afs.collection('colonists', ref => ref.where('world_id', '==', gameWorldId)).get().toPromise()
+          lastValueFrom(this.afs.collection('colonists', ref => ref.where('world_id', '==', gameWorldId)).get())
         ])
-          .then(([continentsSnap, regionsSnap, activitiesSnap, buildingsSnap, colonistsSnap]) => {
+          .then(([continentsSnap, regionsSnap, activitiesSnap, partiesSnap, buildingsSnap, colonistsSnap]) => {
             const continents = continentsSnap.docs.map(doc => doc.data() as Continent);
             const regions = regionsSnap.docs.map(doc => doc.data() as Region);
             const activities = activitiesSnap.docs.map(doc => doc.data() as RegionPlayerActivity);
+            const parties = partiesSnap.docs.map(doc => doc.data() as Party);
             const buildings = buildingsSnap.docs.map(doc => doc.data() as Building);
             const colonists = colonistsSnap.docs.map(doc => doc.data() as Colonist);
 
@@ -65,6 +70,12 @@ export class FirebaseService {
 
             activities.forEach(activity => {
               activity.colony.buildings = buildings.filter(building => building.region_id === activity.region_id);
+              activity.parties = parties.filter(party => activity.party_ids.includes(party.id));
+            });
+
+            parties.forEach(party => {
+              party.colonists = colonists.filter(colonist => colonist.region_id === party.current_region_id);
+              party.colonist_ids = party.colonists.map(colonist => colonist.id);
             });
 
             buildings.forEach(building => {
@@ -85,6 +96,15 @@ export class FirebaseService {
     const allContinents = gameWorld.continents || [];
     const allRegions = allContinents.map(continent => continent.regions).flat();
     const regionPlayerActivity = allRegions.map(region => region.player_activity).flat();
+    // Extract parties and remove the actual objects, retaining only IDs
+    const allParties: Party[] = [];
+    regionPlayerActivity.forEach(activity => {
+        if (activity.parties) {
+            allParties.push(...activity.parties);
+            activity.party_ids = activity.parties.map(p => p.id);
+            delete activity.parties;
+        }
+    });
     const buildings = regionPlayerActivity.map(activity => activity.colony.buildings).flat();
     const colonists = buildings.map(building => building.assigned_colonists).flat();
     // Remove all children objects to store only ids
@@ -117,9 +137,14 @@ export class FirebaseService {
     });
     // Save all player activities
     regionPlayerActivity.forEach(activity => {
-      const activityRef = this.afs.collection('player_activities').doc(activity.id).ref;
+      const activityRef = this.afs.collection('players_activity').doc(activity.id).ref;
       batch.set(activityRef, activity);
     });
+    // Save all parties
+    allParties.forEach(party => {
+      const partyRef = this.afs.collection('parties').doc(party.id).ref;
+      batch.set(partyRef, party);
+  });
     // Save all buildings
     buildings.forEach(building => {
       const buildingRef = this.afs.collection('buildings').doc(building.id).ref;
@@ -161,7 +186,7 @@ export class FirebaseService {
     await checkAndCommitBatch();
 
     // Array of collections to be checked and deleted
-    const collections = ['continents', 'regions', 'player_activities', 'buildings', 'colonists'];
+    const collections = ['continents', 'regions', 'players_activity', 'buildings', 'colonists', 'parties'];
 
     for (const collection of collections) {
       const snapshot = await lastValueFrom(this.afs.collection(collection, ref => ref.where('world_id', '==', gameWorldId)).get());

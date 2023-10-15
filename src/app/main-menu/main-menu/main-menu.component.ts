@@ -60,7 +60,8 @@ export class MainMenuComponent implements OnInit {
           this.world = world;
           console.log('game world created', this.world);
           this.firebase.saveGame(world).then(() => {
-            this.router.navigate(['/game']);
+            this.engine.startEngine(world);
+            this.router.navigate(['/game-world']);
           });
         });
 
@@ -73,9 +74,9 @@ export class MainMenuComponent implements OnInit {
   onLoadGame(game: GameWorld) {
     this.firebase.loadGame(game.id).then((world) => {
       this.world = world;
-      this.engine.gameWorld = world;
       console.log('game world loaded', this.world);
-      this.router.navigate(['/game']);
+      this.engine.startEngine(world);
+      this.router.navigate(['/game-world']);
     });
   }
 

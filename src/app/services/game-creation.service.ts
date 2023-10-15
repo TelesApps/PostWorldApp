@@ -3,11 +3,12 @@ import { GameWorld, createWorldObj, TerrainType } from '../interfaces/game-world
 import { AirtableService } from './airtable.service';
 import { map, take } from 'rxjs';
 import { SupabaseService } from './supabase.service';
-import { Region, createRegionObj, createRegionPlayerActivityObj } from '../interfaces/regions.interface';
+import { Party, Region, createPartyObj, createRegionObj, createRegionPlayerActivityObj } from '../interfaces/regions.interface';
 import { Continent, createContinentsObj } from '../interfaces/continents.interface';
 import { v4 as uuidv4 } from 'uuid';
 import { FirebaseService } from './firebase.service';
 import { Player } from '../interfaces/player.interface';
+import { Colonist, createColonistObj } from '../interfaces/colonist.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -175,9 +176,20 @@ export class GameCreationService {
     // select a random region from the list of starting regions
     const startingRegion = startingRegions[Math.floor(Math.random() * startingRegions.length)];
     console.log('starting region', startingRegion);
+    startingRegion.has_player_activity = true;
     const playerActivity = createRegionPlayerActivityObj(
       world.created_player_id, world.id, startingRegion.continent_id, startingRegion.id);
     playerActivity.id = uuidv4();
+    playerActivity.explored_percent = .01;
+    playerActivity.civilization_id = world.created_player_id;
+    // Create Starting Colonist and Party
+    const startingColonist: Colonist = createColonistObj(playerActivity.player_id, world.id,
+      startingRegion.continent_id, startingRegion.id, uuidv4());
+    const party: Party = createPartyObj(startingColonist.player_id, world.id, startingRegion.continent_id, startingRegion.id, uuidv4());
+    party.colonist_ids.push(startingColonist.id);
+    party.colonists.push(startingColonist);
+    playerActivity.party_ids.push(party.id);
+    playerActivity.parties.push(party);
     startingRegion.player_activity.push(playerActivity);
   }
 
