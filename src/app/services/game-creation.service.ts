@@ -186,6 +186,7 @@ export class GameCreationService {
     const startingColonist: Colonist = createColonistObj(playerActivity.player_id, world.id,
       startingRegion.continent_id, startingRegion.id, uuidv4());
     const party: Party = createPartyObj(startingColonist.player_id, world.id, startingRegion.continent_id, startingRegion.id, uuidv4());
+    startingColonist.assigned_party_id = party.id;
     party.colonist_ids.push(startingColonist.id);
     party.colonists.push(startingColonist);
     playerActivity.party_ids.push(party.id);
