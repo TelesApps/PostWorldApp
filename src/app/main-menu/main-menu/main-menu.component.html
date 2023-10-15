@@ -66,6 +66,21 @@
     </div>
 </div>
 
+<div class="saved-games">
+    <div *ngFor="let game of savedGames" class="saved-game">
+        <div>{{ game.game_name }}</div>
+        <div>{{ game.map_size }}</div>
+        <div>{{ game.map_type }}</div>
+        <div>{{ game.sea_lvl }}</div>
+        <div>{{ game.hill_lvl }}</div>
+        <div>{{ game.forestry }}</div>
+        <div>{{ game.temperature }}</div>
+        <div>{{ game.rainfall }}</div>
+        <button mat-raised-button color="primary" (click)="onLoadGame(game)">Load Game</button>
+        <button mat-raised-button color="primary" (click)="onDeleteGame(game)">Delete Game</button>
+    </div>
+</div>
+
 <div *ngIf="world && world.continents" class="world">
     <div class="continents" *ngFor="let continents of world.continents">
         <p>

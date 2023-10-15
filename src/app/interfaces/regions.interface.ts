@@ -1,3 +1,4 @@
+import { Colony } from "./colony.interface";
 import { TerrainType } from "./game-world.interface";
 import { Resource } from "./resource.interface";
 
@@ -52,8 +53,8 @@ export function createRegionObj(): Region {
         player_activity: []
     }
 }
-
 export interface RegionPlayerActivity {
+    id: string;
     player_id: string;
     world_id: string;
     continent_id: string;
@@ -63,32 +64,27 @@ export interface RegionPlayerActivity {
     is_explored: boolean;
     is_colonized: boolean;
     explored_percent: number;
-    colony: Colony;
+    colony?: Colony;
 }
 
-export interface Colony {
-    buildings: Building[];
-    colonist_ids: string[];
-    colonists?: Colonist[];
-    resources?: Resource[];
-}
-
-export interface Building {
-    player_id: string;
-    world_id: string;
-    continent_id: string;
-    region_id: string;
-    id: string;
-    assigned_colonists: Colonist[];
-}
-
-export interface Colonist {
-    player_id: string;
-    world_id: string;
-    continent_id: string;
-    region_id: string;
-    id: string;
-    assigned_residence_id: string;
-    assigned_building_id: string;
-    // Alot of additional data for each colonists here, name, happiness, etc.
+export function createRegionPlayerActivityObj(
+    player_id: string, world_id: string, continent_id: string, region_id: string): RegionPlayerActivity {
+    return {
+        id: '',
+        player_id: player_id,
+        world_id: world_id,
+        continent_id: continent_id,
+        region_id: region_id,
+        is_region_owner: false,
+        civilization_id: '',
+        is_explored: false,
+        is_colonized: false,
+        explored_percent: 0,
+        colony: {
+            buildings: [],
+            colonist_ids: [],
+            colonists: [],
+            resources: []
+        }
+    }
 }

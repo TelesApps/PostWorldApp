@@ -23,6 +23,8 @@ export interface GameWorld {
     current_date: Date;
     game_speed_multiplier: number;
     game_time_seconds: number; // defines how many seconds have passed in the game
+    player_ids: string[];
+    civilization_ids: string[];
 }
 
 export interface GameSettings {
@@ -52,7 +54,9 @@ export function createWorldObj(): GameWorld {
         creation_date: new Date(),
         current_date: new Date(),
         game_speed_multiplier: 0,
-        game_time_seconds: 0
+        game_time_seconds: 0,
+        player_ids: [],
+        civilization_ids: []
     }
 }
 

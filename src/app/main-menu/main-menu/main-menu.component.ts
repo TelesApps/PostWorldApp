@@ -10,6 +10,7 @@ import { NeonDataService } from 'src/app/services/neon-data.service';
 import { SupabaseService } from 'src/app/services/supabase.service';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { Router } from '@angular/router';
+import { EngineService } from 'src/app/services/engine.service';
 
 @Component({
   selector: 'app-main-menu',
@@ -28,17 +29,31 @@ export class MainMenuComponent implements OnInit {
 
   player: Player;
   world: GameWorld;
+  savedGames: GameWorld[];
 
-  constructor(private GC: GameCreationService, private auth: AuthService, private firebase: FirebaseService, private router: Router) { }
+  constructor(
+    private GC: GameCreationService,
+    private auth: AuthService,
+    private firebase: FirebaseService,
+    private router: Router,
+    private engine: EngineService) { }
 
 
   ngOnInit() {
     // this.onCreateGame()
-    this.auth.getPlayer().then(player => { this.player = player; });
+    this.auth.getPlayer().then(player => { 
+      this.player = player;
+      this.onLoadSaveGames(player.player_id);
+     });
+  }
+
+  onLoadSaveGames(playerId: string) {
+    this.firebase.getSavedGames(playerId).then((savedGames) => {
+      this.savedGames = savedGames;
+    });
   }
 
   onCreateGame() {
-
     if (this.player) {
       this.GC.createWorld(this.player, this.mapSize, this.mapType, this.seaLvl,
         this.hillLvl, this.forestry, this.temperature, this.rainfall).then((world) => {
@@ -52,6 +67,26 @@ export class MainMenuComponent implements OnInit {
     } else {
       console.error('No player logged in');
     }
+  }
+
+  
+  onLoadGame(game: GameWorld) {
+    this.firebase.loadGame(game.id).then((world) => {
+      this.world = world;
+      this.engine.gameWorld = world;
+      console.log('game world loaded', this.world);
+      this.router.navigate(['/game']);
+    });
+  }
+
+  onDeleteGame(game: GameWorld) {
+    this.firebase.deleteGame(game.id).then(() => {
+      console.log('game deleted');
+      this.auth.getPlayer().then(player => { 
+        this.player = player;
+        this.onLoadSaveGames(player.player_id);
+       });
+    });
   }
 
 

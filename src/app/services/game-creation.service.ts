@@ -3,7 +3,7 @@ import { GameWorld, createWorldObj, TerrainType } from '../interfaces/game-world
 import { AirtableService } from './airtable.service';
 import { map, take } from 'rxjs';
 import { SupabaseService } from './supabase.service';
-import { Region, createRegionObj } from '../interfaces/regions.interface';
+import { Region, createRegionObj, createRegionPlayerActivityObj } from '../interfaces/regions.interface';
 import { Continent, createContinentsObj } from '../interfaces/continents.interface';
 import { v4 as uuidv4 } from 'uuid';
 import { FirebaseService } from './firebase.service';
@@ -87,15 +87,17 @@ export class GameCreationService {
   constructor(private airtabel: AirtableService, private supabase: SupabaseService) { }
 
   createWorld(player: Player, mapSize: string, mapType: string, seaLvl: string, hillLvl: string,
-    forestry: string, temperature: string, rainfall: string) {
+    forestry: string, temperature: string, rainfall: string, gameName?: string): Promise<GameWorld> {
     return this.supabase.getAllTerrainTypes().then((terrains) => {
+      // #TODO add additional logic to add other Players and AI here
       console.log('res from Supabase', terrains);
       // console.log(JSON.stringify(res));
       const world: GameWorld = createWorldObj();
-      world.id = player.email + Date.now();
+      world.id = player.email + '_' + Date.now();
       world.created_player_id = player.player_id;
+      world.civilization_ids.push(player.player_id);
       world.game_difficulty = 'normal';
-
+      world.game_name = gameName || player.email;
       world.map_size = mapSize;
       world.map_type = mapType;
       world.sea_lvl = seaLvl;
@@ -113,9 +115,13 @@ export class GameCreationService {
       this.setRegionForestryLevel(world, forestry, rainfall);
       this.setRegionWaterAmount(world, forestry, rainfall);
       this.setRegionTerrainType(world, terrains);
+      this.setPlayersStartingLocations(world);
       return world;
 
     });
+
+    // IF USING AIRTABLE BELLOW
+
     // return this.airtabel.getTerrainTypes().pipe(map((terrains: TerrainType[]) => {
     //   console.log('data from airtable', terrains)
     //   // console.log(JSON.stringify(terrains));
@@ -145,6 +151,34 @@ export class GameCreationService {
     //   this.setRegionTerrainType(world, terrains);
     //   return world;
     // }));
+  }
+
+  private setPlayersStartingLocations(world: GameWorld) {
+    // get continents with the most regions
+    const continents = world.continents.sort((a, b) => b.regions.length - a.regions.length);
+    // start player in a region that has is_costal_region = true on the largest continent of the map
+    // with a preference of region.ylocation to be 2, 3 or 4.
+    const startingRegions = continents[0].regions.filter(region => region.is_costal_region &&
+      region.ylocation >= 2 && region.ylocation <= 4);
+    // if no regions are found with the above criteria then select a region from another continent with the same criteria
+    if (startingRegions.length === 0) {
+      for (let i = 1; i < continents.length; i++) {
+        const continent = continents[i];
+        const regions = continent.regions.filter(region => region.is_costal_region &&
+          region.ylocation >= 2 && region.ylocation <= 4);
+        if (regions.length > 0) {
+          startingRegions.push(regions[0]);
+          break;
+        }
+      }
+    }
+    // select a random region from the list of starting regions
+    const startingRegion = startingRegions[Math.floor(Math.random() * startingRegions.length)];
+    console.log('starting region', startingRegion);
+    const playerActivity = createRegionPlayerActivityObj(
+      world.created_player_id, world.id, startingRegion.continent_id, startingRegion.id);
+    playerActivity.id = uuidv4();
+    startingRegion.player_activity.push(playerActivity);
   }
 
   private setRegionTerrainType(world: GameWorld, terrainList: TerrainType[]) {
@@ -202,9 +236,13 @@ export class GameCreationService {
   }
 
   private isTerrainPossibleForRegion(terrain: TerrainType, region: Region): boolean {
+    if (!terrain.is_possible_in_coast && region.is_costal_region) {
+      return false;
+    }
+    if (!terrain.is_possible_with_fresh_water && region.has_fresh_water) {
+      return false;
+    }
     return (
-      terrain.is_possible_in_coast === region.is_costal_region &&
-      terrain.is_possible_with_fresh_water === region.has_fresh_water &&
       terrain.possible_ylocations.includes(region.ylocation) &&
       terrain.possible_hill_lvl.includes(region.hill_lvl) &&
       terrain.possible_forestry_lvl.includes(region.forestry_lvl) &&
@@ -528,7 +566,7 @@ export class GameCreationService {
       for (let index = 0; index < continent.totalCoasts; index++) {
         const region = createRegionObj();
         region.world_id = world.id;
-        region.continent_id = continent.continent_number;
+        region.continent_id = continent.id;
         region.id = uuidv4();
         region.is_costal_region = true;
         continent.regions.push(region);
