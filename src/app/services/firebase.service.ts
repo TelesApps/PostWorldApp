@@ -96,17 +96,18 @@ export class FirebaseService {
     const allContinents = gameWorld.continents || [];
     const allRegions = allContinents.map(continent => continent.regions).flat();
     const regionPlayerActivity = allRegions.map(region => region.player_activity).flat();
+    const allColonists = regionPlayerActivity.map(activity => activity.colony.colonists).flat();
     // Extract parties and remove the actual objects, retaining only IDs
     const allParties: Party[] = [];
     regionPlayerActivity.forEach(activity => {
-        if (activity.parties) {
-            allParties.push(...activity.parties);
-            activity.party_ids = activity.parties.map(p => p.id);
-            delete activity.parties;
-        }
+      if (activity.parties) {
+        allParties.push(...activity.parties);
+        allColonists.push(...activity.parties.map(p => p.colonists).flat());
+        activity.party_ids = activity.parties.map(p => p.id);
+        delete activity.parties;
+      }
     });
     const buildings = regionPlayerActivity.map(activity => activity.colony.buildings).flat();
-    const colonists = buildings.map(building => building.assigned_colonists).flat();
     // Remove all children objects to store only ids
     gameWorld.total_terrain_types_json = Object.fromEntries(gameWorld.total_terrain_types);
     delete gameWorld.total_terrain_types;
@@ -144,14 +145,14 @@ export class FirebaseService {
     allParties.forEach(party => {
       const partyRef = this.afs.collection('parties').doc(party.id).ref;
       batch.set(partyRef, party);
-  });
+    });
     // Save all buildings
     buildings.forEach(building => {
       const buildingRef = this.afs.collection('buildings').doc(building.id).ref;
       batch.set(buildingRef, building);
     });
     // Save all colonists
-    colonists.forEach(colonist => {
+    allColonists.forEach(colonist => {
       const colonistRef = this.afs.collection('colonists').doc(colonist.id).ref;
       batch.set(colonistRef, colonist);
     });
@@ -209,4 +210,91 @@ export class FirebaseService {
       }
     }
   }
+
+  public getAllColonists(gameWorldId: string): Promise<Colonist[]> {
+    return lastValueFrom(this.afs.collection('colonists', ref => ref.where('world_id', '==', gameWorldId)).get())
+      .then((snapshot) => {
+        const colonists = snapshot.docs.map(doc => doc.data() as Colonist);
+        return colonists;
+      });
+  }
+
+  public getAllParties(gameWorldId: string): Promise<Party[]> {
+    return lastValueFrom(this.afs.collection('parties', ref => ref.where('world_id', '==', gameWorldId)).get())
+      .then((snapshot) => {
+        const parties = snapshot.docs.map(doc => doc.data() as Party);
+        return parties;
+      });
+  }
+
+  public getAllBuildings(gameWorldId: string): Promise<Building[]> {
+    return lastValueFrom(this.afs.collection('buildings', ref => ref.where('world_id', '==', gameWorldId)).get())
+      .then((snapshot) => {
+        const buildings = snapshot.docs.map(doc => doc.data() as Building);
+        return buildings;
+      });
+  }
+
+  public getAllRegions(gameWorldId: string): Promise<Region[]> {
+    return lastValueFrom(this.afs.collection('regions', ref => ref.where('world_id', '==', gameWorldId)).get())
+      .then((snapshot) => {
+        const regions = snapshot.docs.map(doc => doc.data() as Region);
+        return regions;
+      });
+  }
+
+  public getAllContinents(gameWorldId: string): Promise<Continent[]> {
+    return lastValueFrom(this.afs.collection('continents', ref => ref.where('world_id', '==', gameWorldId)).get())
+      .then((snapshot) => {
+        const continents = snapshot.docs.map(doc => doc.data() as Continent);
+        return continents;
+      });
+  }
+
+  public async getAllPlayerActivity(gameWorldId: string): Promise<RegionPlayerActivity[]> {
+    try {
+      const [activitiesSnap, partiesSnap, colonistsSnap] = await Promise.all([
+        lastValueFrom(this.afs.collection('players_activity', ref => ref.where('world_id', '==', gameWorldId)).get()),
+        lastValueFrom(this.afs.collection('parties', ref => ref.where('world_id', '==', gameWorldId)).get()),
+        lastValueFrom(this.afs.collection('colonists', ref => ref.where('world_id', '==', gameWorldId)).get())
+      ]);
+
+      const activities = activitiesSnap.docs.map(doc => doc.data() as RegionPlayerActivity);
+      const parties = partiesSnap.docs.map(doc => doc.data() as Party);
+      const colonists = colonistsSnap.docs.map(doc => doc.data() as Colonist);
+
+      activities.forEach(activity => {
+        // Assign parties to activities
+        if (activity.party_ids) {
+          activity.parties = parties.filter(party => activity.party_ids.includes(party.id));
+
+          // For each party, assign the corresponding colonists
+          activity.parties.forEach(party => {
+            party.colonists = colonists.filter(colonist => party.colonist_ids.includes(colonist.id));
+          });
+        }
+
+        // Assign colonists to colonies if the activity has a colony
+        if (activity.colony) {
+          activity.colony.colonists = colonists.filter(colonist => !colonist.assigned_party_id);
+        }
+      });
+
+      return activities;
+    } catch (error) {
+      console.error("Error fetching player activity: ", error);
+      throw error;
+    }
+  }
+
+
+  public getAllPlayerActivityForRegion(gameWorldId: string, regionId: string): Promise<RegionPlayerActivity[]> {
+    return lastValueFrom(this.afs.collection('players_activity', ref => ref.where('world_id', '==', gameWorldId).where('region_id', '==', regionId)).get())
+      .then((snapshot) => {
+        const playerActivity = snapshot.docs.map(doc => doc.data() as RegionPlayerActivity);
+        return playerActivity;
+      });
+  }
+
+
 }

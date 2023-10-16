@@ -1,1 +1,14 @@
 <p>World View Here When sufficently explored, show all the continents</p>
+<div>
+    <div *ngIf="(engine.allPlayerActivity | async) as activities" class="party">
+        <div *ngFor="let activity of activities" class="colonist">
+            <div>Player Activity in Region</div>
+            <div *ngFor="let party of activity.parties">
+                <div>Party</div>
+                <div *ngFor="let colonist of party.colonists">
+                    colonist food: {{colonist.food}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
