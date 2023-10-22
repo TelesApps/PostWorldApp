@@ -1,11 +1,13 @@
 /// <reference lib="webworker" />
 
+import { Civilization } from "../interfaces/civilization.interface";
 import { Colonist } from "../interfaces/colonist.interface";
 import { Building } from "../interfaces/colony.interface";
 import { Continent } from "../interfaces/continents.interface";
 import { GameWorld } from "../interfaces/game-world.interface";
-import { Party, Region, RegionPlayerActivity } from "../interfaces/regions.interface";
-import { updateColonistPerSecond } from "./colonist.functions";
+import { RegionPlayerActivity } from "../interfaces/player_activity.interface";
+import { Party, Region } from "../interfaces/regions.interface";
+import { ColonistActions } from "./colonist.functions";
 
 let gameSpeedMultiplier: number = 1;
 
@@ -14,6 +16,7 @@ let everyThirtySecondsInterval: number;
 let everyNinetyInterval: number;
 
 let gameWorld: GameWorld;
+let playerCivilization: Civilization;
 let allContinents: Continent[];
 let allRegions: Region[];
 // let allParties: Party[];
@@ -28,17 +31,17 @@ function setIntervals(): void {
 
   everySecondInterval = <number><any>setInterval(() => {
     // Every-second tasks
-    //// Update colonists
+    //// PlayerActivity
     allPlayerActivity.forEach(activity => {
       const partyColonists = activity.parties.map(party => party.colonists).flat();
       const colonists = activity.colony.colonists;
-      partyColonists.forEach(colonist => { updateColonistPerSecond(colonist); });
-      colonists.forEach(colonist => { updateColonistPerSecond(colonist, activity.colony); });
+      partyColonists.forEach(colonist => { ColonistActions.updateColonistPerSecond(colonist); });
+      colonists.forEach(colonist => { ColonistActions.updateColonistPerSecond(colonist, activity.colony); });
     });
     //// Update other things
     postMessage({
       type: 'UPDATED_GAME_WORLD', payload: {
-        gameWorld, allContinents, allRegions, allPlayerActivity, allBuildings
+        gameWorld, playerCivilization, allContinents, allRegions, allPlayerActivity, allBuildings
       }
     });
   }, 1000 / gameSpeedMultiplier);
@@ -56,11 +59,11 @@ function setIntervals(): void {
 setIntervals();
 
 self.onmessage = (event: MessageEvent) => {
-  console.log('Message received from main thread', event.data);
   switch (event.data.type) {
     case 'INIT_WORLD':
       // Initialize the game world
       gameWorld = event.data.payload.gameWorld;
+      playerCivilization = event.data.payload.playerCivilization;
       allContinents = event.data.payload.allContinents;
       allRegions = event.data.payload.allRegions;
       // allParties = event.data.payload.allParties;

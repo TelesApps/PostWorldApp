@@ -1,14 +1,55 @@
-<p>World View Here When sufficently explored, show all the continents</p>
-<div>
-    <div *ngIf="(engine.allPlayerActivity | async) as activities" class="party">
-        <div *ngFor="let activity of activities" class="colonist">
-            <div>Player Activity in Region</div>
-            <div *ngFor="let party of activity.parties">
-                <div>Party</div>
-                <div *ngFor="let colonist of party.colonists">
-                    colonist food: {{colonist.food}}
+<div class="game" *ngIf="civilization">
+    <div class="hud">
+        <div class="world-explored">
+            <div>World Explored</div>
+            <div *ngIf="civilization.explored_perspective !== null">{{civilization.explored_perspective}}%</div>
+            Game Time/Date
+        </div>
+        <div class="civ-resources">
+            <div>Resources being tracked</div>
+            <mat-icon aria-hidden="false" aria-label="Example home icon">menu</mat-icon>
+        </div>
+        <div class="menu-btns">
+            <button mat-raised-button color="primary">Menu</button>
+        </div>
+    </div>
+    <div class="game-world-container">
+        <div class="map-area">
+            <div class="continent">
+                <mat-icon aria-hidden="false" aria-label="Zoom Out" color="primary">zoom_out</mat-icon>
+                <div>Continent Name</div>
+            </div>
+            <div class="regions-area">
+                <div class="regions-header">
+                    <mat-icon aria-hidden="false">filter_list</mat-icon>
+                    <b>Discovered Regions</b>
+                </div>
+                <div *ngIf="civilization" class="regions-list">
+                    <div class="region" *ngFor="let region of civilization.discovered_regions let i = index"
+                    (click)="onSelectRegion(i)">
+                        <div class="region-type">{{ region.terrain_type.label }}</div>
+                        <div>Temperature</div>
+                        <div>Has Fresh Water</div>
+                        <div>Water Level</div>
+                        <div>Resources</div>
+                    </div>
                 </div>
             </div>
         </div>
+        <div class="details-area">
+            <h2>Detailed Area</h2>
+        </div>
     </div>
+    <!-- <div *ngIf="civilization" class="continents-list">
+        <div class="continent" *ngFor="let continent of civilization.discovered_continents">
+            <div>continent number</div>
+            {{continent.continent_number}}
+        </div>
+        <div class="regions-list">
+            <div class="region" *ngFor="let region of civilization.discovered_regions">
+                <div>Region</div>
+                {{region.id}}
+            </div>
+        </div>
+    </div> -->
 </div>

@@ -1,0 +1,61 @@
+.game {
+    height: calc(100vh - 16px);
+    padding: 8px;
+}
+
+.hud {
+    height: fit-content;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.game-world-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap-reverse;
+}
+
+.map-area {
+    flex-grow: 3;
+    min-width: 380px;
+    display: flex;
+    flex-direction: column;
+    mat-icon {
+        cursor: pointer;
+    }
+}
+
+.continent {
+    font-size: 1.5rem;
+    font-weight: bold;
+    display: flex;
+}
+
+.regions-area {
+    margin-top: 4px;
+    .regions-header {
+        display: flex;
+    }
+    .regions-list {
+        display: flex;
+        flex-wrap: wrap;
+    }
+}
+
+.region {
+    margin: 4px;
+    padding: 4px;
+    border: 1px solid black;
+    border-radius: 8px;
+    cursor: pointer;
+    .region-type {
+        font-weight: bold;
+        text-align: center;
+    }
+}
+
+.details-area {
+    flex-grow: 1;
+    min-width: 280px;
+}

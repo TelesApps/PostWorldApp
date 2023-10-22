@@ -12,6 +12,7 @@ import { FirebaseService } from 'src/app/services/firebase.service';
 import { Router } from '@angular/router';
 import { EngineService } from 'src/app/services/engine.service';
 import { Region } from 'src/app/interfaces/regions.interface';
+import { Civilization } from 'src/app/interfaces/civilization.interface';
 
 @Component({
   selector: 'app-main-menu',
@@ -44,34 +45,33 @@ export class MainMenuComponent implements OnInit {
     // this.onCreateGame()
     this.auth.getPlayer().then(player => {
       this.player = player;
-      this.onLoadSaveGames(player.player_id);
+      this.onLoadSavedGames(player.player_id);
     });
   }
 
-  onLoadSaveGames(playerId: string) {
+  async onLoadSavedGames(playerId: string) {
     this.firebase.getSavedGames(playerId).then((savedGames) => {
       this.savedGames = savedGames;
     });
   }
 
-  onCreateGame() {
+  async onCreateGame() {
     if (this.player) {
-      this.GC.createWorld(this.player, this.mapSize, this.mapType, this.seaLvl,
-        this.hillLvl, this.forestry, this.temperature, this.rainfall).then((world) => {
-          this.world = world;
-          console.log('game world created', this.world);
-          this.firebase.saveGame(world).then(() => {
-            this.onLoadGame(world);
-          });
-        });
-
+      const creation: { world: GameWorld, civilization: Civilization } = await this.GC.createWorld(
+        this.player, this.mapSize, this.mapType, this.seaLvl, this.hillLvl, this.forestry, this.temperature, this.rainfall);
+        this.world = creation.world;
+        console.log('game world created', this.world);
+      console.log('saving to firebase');
+      await this.firebase.saveGame(creation.world);
+      await this.firebase.saveCivilization(creation.civilization);
+      this.onLoadGame(creation.world, creation.civilization.id);
     } else {
       console.error('No player logged in');
     }
   }
 
 
-  async onLoadGame(gameWorld: GameWorld) {
+  async onLoadGame(gameWorld: GameWorld, civilization_id: string) {
     // get all of the collections from firebase to pass it to engine
     const allContinents = await this.firebase.getAllContinents(gameWorld.id);
     const allRegions = await this.firebase.getAllRegions(gameWorld.id);
@@ -79,8 +79,9 @@ export class MainMenuComponent implements OnInit {
     const allPlayerActivity = await this.firebase.getAllPlayerActivity(gameWorld.id);
     const allBuildings = await this.firebase.getAllBuildings(gameWorld.id);
     const allColonists = await this.firebase.getAllColonists(gameWorld.id);
+    const playerCivilization = await this.firebase.getPlayerCivilization(gameWorld.id, this.player.player_id);
 
-    this.engine.startEngine(gameWorld, allContinents, allRegions, allParties, allPlayerActivity, allBuildings, allColonists);
+    this.engine.startEngine(gameWorld, playerCivilization, allContinents, allRegions, allParties, allPlayerActivity, allBuildings, allColonists);
     this.router.navigate(['/game-world']);
 
     // this.firebase.loadGame(game.id).then((world) => {
@@ -91,11 +92,17 @@ export class MainMenuComponent implements OnInit {
   }
 
   onDeleteGame(game: GameWorld) {
-    this.firebase.deleteGame(game.id).then(() => {
-      console.log('game deleted');
-      this.auth.getPlayer().then(player => {
-        this.player = player;
-        this.onLoadSaveGames(player.player_id);
+    this.firebase.getPlayerCivilization(game.id, game.created_player_id).then((civilization) => {
+      console.log('civilization', civilization);
+      this.firebase.deleteCivilization(civilization.id).then(() => {
+        console.log('civilization deleted');
+      });
+      this.firebase.deleteGame(game.id).then(() => {
+        console.log('game deleted');
+        this.auth.getPlayer().then(player => {
+          this.player = player;
+          this.onLoadSavedGames(player.player_id);
+        });
       });
     });
   }

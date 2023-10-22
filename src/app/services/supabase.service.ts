@@ -28,7 +28,14 @@ export class SupabaseService {
   }
 
   async getAllTerrainTypes(): Promise<TerrainType[]> {
-    return (await this.supabase.from('Terrain Types').select('*')).data;
+    //return 
+    const promiseData = (await this.supabase.from('Terrain Types').select('*')).data;
+    if(promiseData) {
+      console.log('promiseData from supabase: ', promiseData);
+      return promiseData;
+    } else {
+      throw new Error('No Terrain Types found');
+    }
   }
 
   addRow() {

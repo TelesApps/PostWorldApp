@@ -1,6 +1,6 @@
 import { Colonist } from "./colonist.interface";
-import { Colony } from "./colony.interface";
 import { TerrainType } from "./game-world.interface";
+import { RegionPlayerActivity } from "./player_activity.interface";
 import { Resource } from "./resource.interface";
 
 export interface Region {
@@ -16,10 +16,12 @@ export interface Region {
     rainfall_lvl: number;
     terrain_type: TerrainType;
     ground_water_amount: number;
+    current_temperature?: number;
     region_resources?: Resource[];
     has_player_activity: boolean;
     player_activity_ids: string[];
     player_activity?: RegionPlayerActivity[];
+    is_selected_in_map: boolean;
 }
 
 export function createRegionObj(): Region {
@@ -51,46 +53,8 @@ export function createRegionObj(): Region {
         region_resources: [],
         has_player_activity: false,
         player_activity_ids: [],
-        player_activity: []
-    }
-}
-export interface RegionPlayerActivity {
-    id: string;
-    player_id: string;
-    world_id: string;
-    continent_id: string;
-    region_id: string;
-    is_region_owner: boolean;
-    civilization_id: string;
-    is_explored: boolean;
-    is_colonized: boolean;
-    explored_percent: number;
-    party_ids: string[];
-    parties?: Party[];
-    colony?: Colony;
-}
-
-export function createRegionPlayerActivityObj(
-    player_id: string, world_id: string, continent_id: string, region_id: string): RegionPlayerActivity {
-    return {
-        id: '',
-        player_id: player_id,
-        world_id: world_id,
-        continent_id: continent_id,
-        region_id: region_id,
-        is_region_owner: false,
-        civilization_id: '',
-        is_explored: false,
-        is_colonized: false,
-        explored_percent: 0,
-        party_ids: [],
-        parties: [],
-        colony: {
-            buildings: [],
-            colonist_ids: [],
-            colonists: [],
-            resources: []
-        }
+        player_activity: [],
+        is_selected_in_map: false
     }
 }
 

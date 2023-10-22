@@ -3,12 +3,14 @@ import { GameWorld, createWorldObj, TerrainType } from '../interfaces/game-world
 import { AirtableService } from './airtable.service';
 import { map, take } from 'rxjs';
 import { SupabaseService } from './supabase.service';
-import { Party, Region, createPartyObj, createRegionObj, createRegionPlayerActivityObj } from '../interfaces/regions.interface';
+import { Party, Region, createPartyObj, createRegionObj } from '../interfaces/regions.interface';
 import { Continent, createContinentsObj } from '../interfaces/continents.interface';
 import { v4 as uuidv4 } from 'uuid';
 import { FirebaseService } from './firebase.service';
 import { Player } from '../interfaces/player.interface';
 import { Colonist, createColonistObj } from '../interfaces/colonist.interface';
+import { createRegionPlayerActivityObj } from '../interfaces/player_activity.interface';
+import { Civilization, createCivilizationObj } from '../interfaces/civilization.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -88,7 +90,7 @@ export class GameCreationService {
   constructor(private airtabel: AirtableService, private supabase: SupabaseService) { }
 
   createWorld(player: Player, mapSize: string, mapType: string, seaLvl: string, hillLvl: string,
-    forestry: string, temperature: string, rainfall: string, gameName?: string): Promise<GameWorld> {
+    forestry: string, temperature: string, rainfall: string, gameName?: string): Promise<{world: GameWorld, civilization: Civilization}> {
     return this.supabase.getAllTerrainTypes().then((terrains) => {
       // #TODO add additional logic to add other Players and AI here
       console.log('res from Supabase', terrains);
@@ -96,7 +98,6 @@ export class GameCreationService {
       const world: GameWorld = createWorldObj();
       world.id = player.email + '_' + Date.now();
       world.created_player_id = player.player_id;
-      world.civilization_ids.push(player.player_id);
       world.game_difficulty = 'normal';
       world.game_name = gameName || player.email;
       world.map_size = mapSize;
@@ -116,9 +117,12 @@ export class GameCreationService {
       this.setRegionForestryLevel(world, forestry, rainfall);
       this.setRegionWaterAmount(world, forestry, rainfall);
       this.setRegionTerrainType(world, terrains);
-      this.setPlayersStartingLocations(world);
-      return world;
-
+      const civilization: Civilization = this.setPlayersStartingLocations(world);
+      world.civilization_ids.push(civilization.id);
+      return {world, civilization};
+    }).catch((err) => {
+      console.error('error from Supabase', err);
+      return err;
     });
 
     // IF USING AIRTABLE BELLOW
@@ -154,7 +158,7 @@ export class GameCreationService {
     // }));
   }
 
-  private setPlayersStartingLocations(world: GameWorld) {
+  private setPlayersStartingLocations(world: GameWorld, civilizationName?: string) {
     // get continents with the most regions
     const continents = world.continents.sort((a, b) => b.regions.length - a.regions.length);
     // start player in a region that has is_costal_region = true on the largest continent of the map
@@ -173,15 +177,22 @@ export class GameCreationService {
         }
       }
     }
+    // Create Civilization
+    const civilization: Civilization = createCivilizationObj(uuidv4(), world.created_player_id, world.id);
+    civilization.civilization_name = civilizationName || 'Unknown';
     // select a random region from the list of starting regions
     const startingRegion = startingRegions[Math.floor(Math.random() * startingRegions.length)];
+    const startingContinent = world.continents.find(continent => continent.id === startingRegion.continent_id);
     console.log('starting region', startingRegion);
+    civilization.discovered_continents.push(startingContinent);
+    civilization.discovered_regions.push(startingRegion);
     startingRegion.has_player_activity = true;
     const playerActivity = createRegionPlayerActivityObj(
       world.created_player_id, world.id, startingRegion.continent_id, startingRegion.id);
     playerActivity.id = uuidv4();
     playerActivity.explored_percent = .01;
-    playerActivity.civilization_id = world.created_player_id;
+    playerActivity.civilization_id = civilization.id;
+    startingRegion.player_activity_ids.push(playerActivity.id);
     // Create Starting Colonist and Party
     const startingColonist: Colonist = createColonistObj(playerActivity.player_id, world.id,
       startingRegion.continent_id, startingRegion.id, uuidv4());
@@ -192,6 +203,7 @@ export class GameCreationService {
     playerActivity.party_ids.push(party.id);
     playerActivity.parties.push(party);
     startingRegion.player_activity.push(playerActivity);
+    return civilization;
   }
 
   private setRegionTerrainType(world: GameWorld, terrainList: TerrainType[]) {
@@ -582,6 +594,7 @@ export class GameCreationService {
         region.continent_id = continent.id;
         region.id = uuidv4();
         region.is_costal_region = true;
+        continent.region_ids.push(region.id);
         continent.regions.push(region);
         regionCount++;
       }

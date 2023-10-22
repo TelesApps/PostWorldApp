@@ -8,7 +8,8 @@ export interface Continent {
     totalWaterSources: number;
     yLocationMin: number;
     yLocationMax: number;
-    regions: Region[];
+    region_ids: string[];
+    regions?: Region[];
 }
 
 export function createContinentsObj(): Continent {
@@ -20,6 +21,7 @@ export function createContinentsObj(): Continent {
         totalWaterSources: 0,
         yLocationMin: 3,
         yLocationMax: 3,
+        region_ids: [],
         regions: []
     }
 }
