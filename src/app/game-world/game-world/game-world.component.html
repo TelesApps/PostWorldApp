@@ -3,14 +3,14 @@
         <div class="world-explored">
             <div>World Explored</div>
             <div *ngIf="civilization.explored_perspective !== null">{{civilization.explored_perspective}}%</div>
-            Game Time/Date
+            Game Time/Date {{ gametime }}
         </div>
         <div class="civ-resources">
             <div>Resources being tracked</div>
             <mat-icon aria-hidden="false" aria-label="Example home icon">menu</mat-icon>
         </div>
         <div class="menu-btns">
-            <button mat-raised-button color="primary">Menu</button>
+            <button mat-raised-button color="primary" routerLink="/">Menu</button>
         </div>
     </div>
     <div class="game-world-container">
@@ -26,30 +26,38 @@
                 </div>
                 <div *ngIf="civilization" class="regions-list">
                     <div class="region" *ngFor="let region of civilization.discovered_regions let i = index"
-                    (click)="onSelectRegion(i)">
+                        (click)="onSelectRegion(i)">
                         <div class="region-type">{{ region.terrain_type.label }}</div>
                         <div>Temperature</div>
                         <div>Has Fresh Water</div>
                         <div>Water Level</div>
                         <div>Resources</div>
+                        <div *ngIf="region.has_player_activity && playersActivity && playersActivity.length > 0">
+                            <div class="activity" *ngFor="let activity of playersActivity">
+                                <div class="party-list" *ngIf="activity.region_id === region.id">
+                                    <div class="party" *ngFor="let party of activity.parties" (click)="onPartySelected(party, $event)">
+                                        <mat-icon aria-hidden="false" aria-label="Party icon" color="primary">groups</mat-icon>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="details-area">
             <h2>Detailed Area</h2>
-        </div>
-    </div>
-    <!-- <div *ngIf="civilization" class="continents-list">
-        <div class="continent" *ngFor="let continent of civilization.discovered_continents">
-            <div>continent number</div>
-            {{continent.continent_number}}
-        </div>
-        <div class="regions-list">
-            <div class="region" *ngFor="let region of civilization.discovered_regions">
-                <div>Region</div>
-                {{region.id}}
+            <div class="no-selection">
+
+            </div>
+            <div class="selected-region">
+                <!-- mode = 'determinate' , 'indeterminate' , 'buffer' , 'query' --> 
+                <app-progress-bar [value]="50" [color]="'accent'"></app-progress-bar>
+                <span>90</span>
+            </div>
+            <div class="selected-party">
+
             </div>
         </div>
-    </div> -->
+    </div>
 </div>

@@ -59,3 +59,37 @@
     flex-grow: 1;
     min-width: 280px;
 }
+
+.party-list {
+    display: flex;
+}
+
+.party {
+    width: 45px;
+    height: 45px;
+    border: 1px solid black;
+    border-radius: 50%;
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+mat-progress-bar {
+    transform: scaleY(8);
+    transform-origin: bottom;
+    border-top-right-radius: 50% 25px;
+    border-bottom-right-radius: 50% 25px;
+    border-top-left-radius: 50% 25px;
+    border-bottom-left-radius: 50% 25px;
+}
+// :host ::ng-deep mat-progress-bar {
+//     // height: 50px;
+//   }
+
+//   :host ::ng-deep mat-progress-bar .mdc-linear-progress__bar-inner {
+//     border-top-width: 50px;
+//   }
+
+//   :host ::ng-deep mat-progress-bar .mdc-linear-progress__buffer-bar {
+//     border-top-width: 50px;
+//   }

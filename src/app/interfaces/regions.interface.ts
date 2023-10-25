@@ -19,8 +19,8 @@ export interface Region {
     current_temperature?: number;
     region_resources?: Resource[];
     has_player_activity: boolean;
-    player_activity_ids: string[];
-    player_activity?: RegionPlayerActivity[];
+    players_activity_ids: string[];
+    players_activity?: RegionPlayerActivity[];
     is_selected_in_map: boolean;
 }
 
@@ -52,8 +52,8 @@ export function createRegionObj(): Region {
         rainfall_lvl: 0,
         region_resources: [],
         has_player_activity: false,
-        player_activity_ids: [],
-        player_activity: [],
+        players_activity_ids: [],
+        players_activity: [],
         is_selected_in_map: false
     }
 }

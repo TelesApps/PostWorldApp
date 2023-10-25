@@ -28,7 +28,7 @@ export class EngineService {
 
   }
 
-  public startEngine(gameWorld: GameWorld, playerCivilization:Civilization, allContinents: Continent[], allRegions: Region[], allParties: Party[],
+  public startEngine(gameWorld: GameWorld, playerCivilization: Civilization, allContinents: Continent[], allRegions: Region[], allParties: Party[],
     allPlayerActivity: RegionPlayerActivity[], allBuildings: Building[], allColonists: Colonist[]): void {
     // initialize the worker if it hasn't been already
     if (!this.worker)
@@ -48,7 +48,7 @@ export class EngineService {
         switch (event.data.type) {
           case 'UPDATED_GAME_WORLD':
             if (event.data.payload.gameWorld)
-            this.gameWorld.next(event.data.payload.gameWorld);
+              this.gameWorld.next(event.data.payload.gameWorld);
             this.civilization.next(event.data.payload.playerCivilization);
             this.allContinents.next(event.data.payload.allContinents);
             this.allRegions.next(event.data.payload.allRegions);
@@ -69,13 +69,14 @@ export class EngineService {
     this.worker.postMessage({ type: 'SET_SPEED', multiplier: this.gameSpeedMultiplier });
   }
 
-   // Let's also add a method to send data to the worker, for instance to update the state based on UI interactions
+  // Let's also add a method to send data to the worker, for instance to update the state based on UI interactions
   private sendUpdateToWorker(payload: any): void {
     this.worker.postMessage({ type: 'UPDATE_STATE', payload });
   }
 
   // And potentially a method to terminate the worker if needed, e.g., if the game ends
-  private terminateWorker(): void {
-    this.worker.terminate();
+  public stopEngine(): void {
+    if (this.worker)
+      this.worker.terminate();
   }
 }

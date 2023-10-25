@@ -17,12 +17,13 @@ import { HexCreationService } from './services/hex-creation.service';
 import { AirtableService } from './services/airtable.service';
 import { HttpClientModule } from '@angular/common/http';
 import { SupabaseService } from './services/supabase.service';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 firebase.initializeApp(environment.firebaseConfig);
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
   ],
   imports: [
     CommonModule,
@@ -31,7 +32,8 @@ firebase.initializeApp(environment.firebaseConfig);
     AngularFireModule.initializeApp(environment.firebaseConfig),
     BrowserAnimationsModule,
     MatSnackBarModule,
-    HttpClientModule
+    HttpClientModule,
+    MatProgressBarModule,
   ],
   providers: [
     AuthService,

@@ -32,7 +32,7 @@ export class FirebaseService {
     });
     // Delete RegionPlayerActivity from Regions and only save the Ids
     civilization.discovered_regions.forEach(region => {
-      delete region.player_activity;
+      delete region.players_activity;
     });
     const civilizationRef = this.afs.collection('civilizations').doc(civilization.id).ref;
     return civilizationRef.set(civilization, { merge: true });
@@ -146,7 +146,15 @@ export class FirebaseService {
   }
 
   public getAllPlayerActivityForRegion(gameWorldId: string, regionId: string): Promise<RegionPlayerActivity[]> {
-    return lastValueFrom(this.afs.collection('players_activity', ref => ref.where('world_id', '==', gameWorldId).where('region_id', '==', regionId)).get())
+    return lastValueFrom(this.afs.collection('players_activity', ref => ref.where('world_id', '==', gameWorldId)
+      .where('region_id', '==', regionId)).get()).then((snapshot) => {
+        const playerActivity = snapshot.docs.map(doc => doc.data() as RegionPlayerActivity);
+        return playerActivity;
+      });
+  }
+
+  public getPlayersActivitiesWithIds(ids: string[]): Promise<RegionPlayerActivity[]> {
+    return lastValueFrom(this.afs.collection('players_activity', ref => ref.where('id', 'in', ids)).get())
       .then((snapshot) => {
         const playerActivity = snapshot.docs.map(doc => doc.data() as RegionPlayerActivity);
         return playerActivity;
@@ -159,7 +167,7 @@ export class FirebaseService {
     // Separate all children of gameWorld into their own collections
     const allContinents = gameWorld.continents || [];
     const allRegions = allContinents.map(continent => continent.regions).flat();
-    const regionPlayerActivity = allRegions.map(region => region.player_activity).flat();
+    const regionPlayerActivity = allRegions.map(region => region.players_activity).flat();
     const allColonists = regionPlayerActivity.map(activity => activity.colony.colonists).flat();
     // Extract parties and remove the actual objects, retaining only IDs
     const allParties: Party[] = [];
@@ -180,7 +188,7 @@ export class FirebaseService {
       delete continent.regions;
     });
     allRegions.forEach(region => {
-      delete region.player_activity;
+      delete region.players_activity;
     });
     regionPlayerActivity.forEach(activity => {
       delete activity.colony.colonists;
@@ -317,7 +325,7 @@ export class FirebaseService {
             });
 
             regions.forEach(region => {
-              region.player_activity = activities.filter(activity => activity.region_id === region.id);
+              region.players_activity = activities.filter(activity => activity.region_id === region.id);
             });
 
             activities.forEach(activity => {

@@ -192,7 +192,7 @@ export class GameCreationService {
     playerActivity.id = uuidv4();
     playerActivity.explored_percent = .01;
     playerActivity.civilization_id = civilization.id;
-    startingRegion.player_activity_ids.push(playerActivity.id);
+    startingRegion.players_activity_ids.push(playerActivity.id);
     // Create Starting Colonist and Party
     const startingColonist: Colonist = createColonistObj(playerActivity.player_id, world.id,
       startingRegion.continent_id, startingRegion.id, uuidv4());
@@ -202,7 +202,7 @@ export class GameCreationService {
     party.colonists.push(startingColonist);
     playerActivity.party_ids.push(party.id);
     playerActivity.parties.push(party);
-    startingRegion.player_activity.push(playerActivity);
+    startingRegion.players_activity.push(playerActivity);
     return civilization;
   }
 
