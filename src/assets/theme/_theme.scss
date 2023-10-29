@@ -1,0 +1,12 @@
+// Include the common styles for Angular Material. We include this here so that you only
+// have to load a single scss file for Angular Material in your app.
+// Be sure that you only ever include this mixin once!
+
+@import 'app-theme.scss';
+@include mat-core();
+@include angular-material-theme($postWorld-app-theme);
+// Include additional themes bellow under css classes on the application
+// Optionally, you can add a class-based dark theme like this:
+.dark-theme {
+  @include angular-material-theme($postWorld-dark-theme);
+}

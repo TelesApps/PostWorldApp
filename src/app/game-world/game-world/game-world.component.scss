@@ -44,15 +44,49 @@
 }
 
 .region {
+    position: relative;
     margin: 4px;
-    padding: 4px;
-    border: 1px solid black;
-    border-radius: 8px;
+    padding: 8px;
     cursor: pointer;
     .region-type {
         font-weight: bold;
         text-align: center;
+        font-size: 13pt;
     }
+    .temperature {
+        position: absolute;
+        top: -10px;
+        left: 85%;
+        background-color: white;
+        width: 35px;
+        height: 35px;
+        font-size: 13pt;
+        border: 1px solid black;
+        border-radius: 50%;
+        box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}
+
+.region::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("../../../assets/images/yellow_hills_coast_small.png") no-repeat center center / cover;
+    opacity: 0.3; /* Adjust this value as needed. Lower values mean more transparency. */
+    z-index: -1; /* Place the background behind the content. */
+}
+
+.region-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px;
 }
 
 .details-area {
@@ -64,16 +98,6 @@
     display: flex;
 }
 
-.party {
-    width: 45px;
-    height: 45px;
-    border: 1px solid black;
-    border-radius: 50%;
-    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
 mat-progress-bar {
     transform: scaleY(8);
     transform-origin: bottom;
@@ -82,14 +106,14 @@ mat-progress-bar {
     border-top-left-radius: 50% 25px;
     border-bottom-left-radius: 50% 25px;
 }
-// :host ::ng-deep mat-progress-bar {
-//     // height: 50px;
-//   }
 
-//   :host ::ng-deep mat-progress-bar .mdc-linear-progress__bar-inner {
-//     border-top-width: 50px;
-//   }
+.details-container {
+    border: 1px solid black;
+}
 
-//   :host ::ng-deep mat-progress-bar .mdc-linear-progress__buffer-bar {
-//     border-top-width: 50px;
-//   }
+.close-btn {
+    text-align: end;
+    position: relative;
+    top: -12px;
+    right: -6px;
+}

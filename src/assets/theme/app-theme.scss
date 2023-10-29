@@ -1,0 +1,83 @@
+@import "@angular/material/theming";
+@import "palette.scss";
+
+// Define the light theme
+$postWorld-app-primary: mat-palette($postWorld-primary, main, lighter, darker);
+$postWorld-app-accent: mat-palette($postWorld-accent, main, lighter, darker);
+$postWorld-app-warn: mat-palette($postWorld-warn, main, lighter, darker);
+$postWorld-app-foreground: mat-palette($postWorld-foreground, main, lighter);
+$postWorld-app-background: mat-palette($postWorld-background, main, lighter, darker);
+
+$postWorld-app-theme: mat-light-theme(
+    $postWorld-app-primary,
+    $postWorld-app-accent,
+    $postWorld-app-warn,
+);
+
+// Define the dark theme
+$postWorld-dark-primary: mat-palette($postWorld-dark-primary, main, lighter, darker);
+$postWorld-dark-accent: mat-palette($postWorld-dark-accent, main, lighter, darker);
+$postWorld-dark-warn: mat-palette($postWorld-dark-warn, main, lighter, darker);
+$postWorld-dark-foreground: mat-palette($postWorld-dark-foreground, main, lighter);
+$postWorld-dark-background: mat-palette($postWorld-dark-background, main, lighter, darker);
+
+$postWorld-dark-theme: mat-dark-theme(
+    $postWorld-dark-primary,
+    $postWorld-dark-accent,
+    $postWorld-dark-warn,
+);
+
+:root {
+    // Using CSS variables to define the theme colors, these can be used in each compoenent's SCSS files.
+    // Light theme properties
+    --primary-main: #{map-get($postWorld-primary, main)};
+    --primary-lighter: #{map-get($postWorld-primary, lighter)};
+    --primary-darker: #{map-get($postWorld-primary, darker)};
+    --accent-main: #{map-get($postWorld-accent, main)};
+    --accent-lighter: #{map-get($postWorld-accent, lighter)};
+    --accent-darker: #{map-get($postWorld-accent, darker)};
+    --warn-main: #{map-get($postWorld-warn, main)};
+    --warn-lighter: #{map-get($postWorld-warn, lighter)};
+    --warn-darker: #{map-get($postWorld-warn, darker)};
+    --foreground-main: #{map-get($postWorld-foreground, main)};
+    --foreground-lighter: #{map-get($postWorld-foreground, lighter)};
+    --foreground-darker: #{map-get($postWorld-foreground, darker)};
+    --background-main: #{map-get($postWorld-background, main)};
+    --background-lighter: #{map-get($postWorld-background, lighter)};
+    --background-darker: #{map-get($postWorld-background, darker)};
+}
+// Sets the Default theme to light
+body {
+    background-color: map-get($postWorld-background, main);
+    color: map-get($postWorld-foreground, main);
+}
+
+/* For dark theme, you may define similar classes */
+.dark-theme {
+    background-color: map-get($postWorld-dark-background, main) !important;
+    color: map-get($postWorld-dark-foreground, main);
+
+    --primary-main: #{map-get($postWorld-dark-primary, main)};
+    --primary-lighter: #{map-get($postWorld-dark-primary, lighter)};
+    --primary-darker: #{map-get($postWorld-dark-primary, darker)};
+    --accent-main: #{map-get($postWorld-dark-accent, main)};
+    --accent-lighter: #{map-get($postWorld-dark-accent, lighter)};
+    --accent-darker: #{map-get($postWorld-dark-accent, darker)};
+    --warn-main: #{map-get($postWorld-dark-warn, main)};
+    --warn-lighter: #{map-get($postWorld-dark-warn, lighter)};
+    --warn-darker: #{map-get($postWorld-dark-warn, darker)};
+    --foreground-main: #{map-get($postWorld-dark-foreground, main)};
+    --foreground-lighter: #{map-get($postWorld-dark-foreground, lighter)};
+    --foreground-darker: #{map-get($postWorld-dark-foreground, darker)};
+    --background-main: #{map-get($postWorld-dark-background, main)};
+    --background-lighter: #{map-get($postWorld-dark-background, lighter)};
+    --background-darker: #{map-get($postWorld-dark-background, darker)};
+}
+
+// Screen Size Break Points
+$mediaXLg_1901: 1901px;
+$mediaLg_1200: 1200px;
+$mediaMd_1024: 1024px;
+$mediaSm_768: 768px;
+$mediaMobile_480: 480px;
+$mediaXSm_320: 320px;

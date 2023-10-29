@@ -13,6 +13,7 @@ import { Router } from '@angular/router';
 import { EngineService } from 'src/app/services/engine.service';
 import { Region } from 'src/app/interfaces/regions.interface';
 import { Civilization } from 'src/app/interfaces/civilization.interface';
+import { StorageService } from 'src/app/services/storage.service';
 
 @Component({
   selector: 'app-main-menu',
@@ -38,7 +39,8 @@ export class MainMenuComponent implements OnInit {
     private auth: AuthService,
     private firebase: FirebaseService,
     private router: Router,
-    private engine: EngineService) { }
+    private engine: EngineService,
+    public storage: StorageService) { }
 
 
   ngOnInit() {

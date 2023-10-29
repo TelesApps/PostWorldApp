@@ -1,0 +1,97 @@
+// Define contrast colors for legibility
+$light-primary-text: #ffffff; // White text for high contrast on dark backgrounds
+$dark-primary-text: #000000; // Black text for high contrast on light backgrounds
+
+// Define the primary palette with contrast colors
+$postWorld-primary: (
+  main: #092151,
+  lighter: #b5bccb,
+  darker: #051437,
+  200: #092151,
+  contrast: (
+    main: $light-primary-text, // White text on main primary color
+    lighter: $dark-primary-text, // Black text on lighter primary color
+    darker: $light-primary-text, // White text on darker primary color
+  ),
+);
+
+// Define the accent palette with contrast colors
+$postWorld-accent: (
+  main: #e09900,
+  lighter: #f6e0b3,
+  darker: #d37c00,
+  200: #e09900,
+  contrast: (
+    main: $dark-primary-text, // Black text on main accent color
+    lighter: $dark-primary-text, // Black text on lighter accent color
+    darker: $dark-primary-text, // Black text on darker accent color
+  ),
+);
+
+// Define the warn palette with contrast colors
+$postWorld-warn: (
+  main: #b10f2e,
+  lighter: #e8b7c0,
+  darker: #98081d,
+  200: #b10f2e,
+  contrast: (
+    main: $light-primary-text, // White text on main warn color
+    lighter: $dark-primary-text, // Black text on lighter warn color
+    darker: $light-primary-text, // White text on darker warn color
+  ),
+);
+
+// Define the foreground palette with contrast colors
+$postWorld-foreground: (
+  main: #183B56,
+  lighter: #253441,
+  darker: #000,
+  700: #616161,
+  contrast: (
+    main: $dark-primary-text, // Black text on main foreground color
+    lighter: $dark-primary-text, // Black text on lighter foreground color
+    darker: $dark-primary-text, // Black text on darker foreground color
+  ),
+);
+
+// Define the background palette with contrast colors
+$postWorld-background: (
+  main: #fdffff,
+  lighter: #ffffff,
+  darker: #fcffffbd,
+  contrast: (
+    main: $dark-primary-text, // Black text on main background color
+    lighter: $dark-primary-text, // Black text on lighter background color
+    darker: $dark-primary-text, // Black text on darker background color
+  ),
+);
+
+// ************************ DARK THEME ************************
+
+// Dark Theme Palettes, Updated these if Primary Accent And Warn colors are different for dark theme
+$postWorld-dark-primary: $postWorld-primary;
+$postWorld-dark-accent: $postWorld-accent;
+$postWorld-dark-warn: $postWorld-warn;
+
+$postWorld-dark-foreground: (
+  main: #e0e0e0, // Light grey for text/icons against dark backgrounds
+  lighter: #bdbdbd, // A lighter grey for a bit more contrast
+  darker: #9e9e9e, // Even lighter grey to ensure visibility on the darkest surfaces
+  700: #757575, // Medium grey for disabled states and such
+  contrast: (
+    main: $dark-primary-text, // Black text on light grey foreground
+    lighter: $dark-primary-text,
+    darker: $dark-primary-text,
+  ),
+);
+
+$postWorld-dark-background: (
+  main: #121212, // Very dark grey, almost black, for main background areas
+  lighter: #1e1e1e, // A slightly lighter shade for surfaces like cards
+  darker: #000000, // Black for the darkest areas like status bars
+  contrast: (
+    main: $light-primary-text, // White text on dark backgrounds
+    lighter: $light-primary-text,
+    darker: $light-primary-text,
+  ),
+);

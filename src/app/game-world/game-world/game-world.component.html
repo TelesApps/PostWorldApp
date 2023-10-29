@@ -25,18 +25,25 @@
                     <b>Discovered Regions</b>
                 </div>
                 <div *ngIf="civilization" class="regions-list">
-                    <div class="region" *ngFor="let region of civilization.discovered_regions let i = index"
+                    <div class="region borders" *ngFor="let region of civilization.discovered_regions let i = index"
                         (click)="onSelectRegion(i)">
                         <div class="region-type">{{ region.terrain_type.label }}</div>
-                        <div>Temperature</div>
-                        <div>Has Fresh Water</div>
-                        <div>Water Level</div>
-                        <div>Resources</div>
-                        <div *ngIf="region.has_player_activity && playersActivity && playersActivity.length > 0">
-                            <div class="activity" *ngFor="let activity of playersActivity">
-                                <div class="party-list" *ngIf="activity.region_id === region.id">
-                                    <div class="party" *ngFor="let party of activity.parties" (click)="onPartySelected(party, $event)">
-                                        <mat-icon aria-hidden="false" aria-label="Party icon" color="primary">groups</mat-icon>
+                        <div class="temperature">68f</div>
+                        <div class="region-content">
+                            <div class="info">
+                                <mat-icon aria-hidden="false">location_city</mat-icon> Uncolonized
+                                <div>Has Fresh Water</div>
+                                <div>Water Level</div>
+                                <div>Resources</div>
+                            </div>
+                            <div *ngIf="region.has_player_activity && playersActivity && playersActivity.length > 0">
+                                <div class="activity" *ngFor="let activity of playersActivity">
+                                    <div class="party-list" *ngIf="activity.region_id === region.id">
+                                        <div class="party" *ngFor="let party of activity.parties"
+                                            (click)="onPartySelected(party, $event)">
+                                            <mat-icon aria-hidden="false" aria-label="Party icon"
+                                                color="primary">groups</mat-icon>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -46,17 +53,22 @@
             </div>
         </div>
         <div class="details-area">
-            <h2>Detailed Area</h2>
-            <div class="no-selection">
+            <div class="details-container">
+                <div class="close-btn">
+                    <button mat-mini-fab color="warn">
+                        <mat-icon aria-hidden="false" aria-label="Example home icon">close</mat-icon>
+                    </button>
+                </div>
+                <div class="no-selection">
+                </div>
+                <div class="selected-region">
+                    <!-- mode = 'determinate' , 'indeterminate' , 'buffer' , 'query' -->
+                    <app-progress-bar [value]="50"></app-progress-bar>
+                    <span>90</span>
+                </div>
+                <div class="selected-party">
 
-            </div>
-            <div class="selected-region">
-                <!-- mode = 'determinate' , 'indeterminate' , 'buffer' , 'query' --> 
-                <app-progress-bar [value]="50" [color]="'accent'"></app-progress-bar>
-                <span>90</span>
-            </div>
-            <div class="selected-party">
-
+                </div>
             </div>
         </div>
     </div>
