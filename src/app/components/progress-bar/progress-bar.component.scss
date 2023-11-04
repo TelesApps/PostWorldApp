@@ -7,7 +7,6 @@
 
 mat-progress-bar {
     position: relative;
-    z-index: -1;
     transform: scaleY(6);
     transform-origin: top;
     border-top-right-radius: 50% 40px;
@@ -17,8 +16,10 @@ mat-progress-bar {
 }
 
 .progress-text {
+    position: relative;
+    z-index: 1;
+    bottom: 2px;
     font-size: 14pt;
     font-weight: 500;
-    color: white;
 }
 

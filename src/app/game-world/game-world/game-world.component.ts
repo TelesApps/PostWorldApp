@@ -5,10 +5,13 @@ import { Civilization } from 'src/app/interfaces/civilization.interface';
 import { GameWorld } from 'src/app/interfaces/game-world.interface';
 import { Player } from 'src/app/interfaces/player.interface';
 import { RegionPlayerActivity } from 'src/app/interfaces/player_activity.interface';
-import { Party, Region } from 'src/app/interfaces/regions.interface';
+import { Region } from 'src/app/interfaces/regions.interface';
+import { Party } from 'src/app/interfaces/party.interface';
 import { AuthService } from 'src/app/services/auth.service';
 import { EngineService } from 'src/app/services/engine.service';
 import { FirebaseService } from 'src/app/services/firebase.service';
+import { StorageService } from 'src/app/services/storage.service';
+import { SupabaseService } from 'src/app/services/supabase.service';
 
 @Component({
   selector: 'app-game-world',
@@ -21,13 +24,19 @@ export class GameWorldComponent implements OnInit, OnDestroy {
   civilization: Civilization
   civSubscription$: Subscription;
   playersActivity: RegionPlayerActivity[];
+
   playersActivitySub$: Subscription;
   selectedRegion: Region;
   selectedParty: Party;
   gametime = 0
   progressValue = 40;
 
-  constructor(private auth: AuthService, public engine: EngineService, private firebase: FirebaseService) { }
+  constructor(
+    private auth: AuthService,
+    public engine: EngineService,
+    private firebase: FirebaseService,
+    private supabase: SupabaseService,
+    public storage: StorageService) { }
 
   ngOnInit(): void {
     this.loadGameState();
@@ -49,46 +58,63 @@ export class GameWorldComponent implements OnInit, OnDestroy {
   testDevelopment() {
     // Use this function to load game durring development
     if (!this.civilization) {
-      this.firebase.getCivilizationWithId('93213836-acf2-4ed4-8578-58e4af6a04c8').then(civ => {
+      this.firebase.getCivilizationWithId('d00ce21e-a525-482d-970b-761bb4874fbf').then(civ => {
         this.civilization = civ;
         console.log('this.civilization: ', this.civilization);
       });
     }
-    if(!this.playersActivity) {
-      this.firebase.getAllPlayerActivity("claudioteles85@gmail.com_1697811615942").then(pa => {
+    if (!this.playersActivity) {
+      this.firebase.getAllPlayerActivity("claudioteles85@gmail.com_1699101872452").then(pa => {
         this.engine.allPlayerActivity.next(pa);
         console.log('this.playersActivity: ', this.playersActivity);
       });
     }
   }
 
+  testChangeTheme() {
+    this.storage.changeTheme();
+    // this.supabase.getResourceUrl('wood').then(url => {
+    //   console.log('url: ', url);
+    // });
+    // this.supabase.getAllResources().then(resources => {
+    //   console.log('resources: ', resources);
+    // });
+  }
+
   getRegionActivities(region: Region): RegionPlayerActivity[] {
-    if(this.playersActivity) {
+    if (this.playersActivity) {
       return this.playersActivity.filter(pa => pa.region_id === region.id);
     }
     else return null;
   }
 
-  
-  onSelectRegion(index: number) {
-    console.log('onSelectRegion: ', index);
-    const allRegions: Region[] = this.engine.allRegions.getValue();
-    if(allRegions) {
-      const selectedRegion = allRegions.find(r => r.id === this.civilization.discovered_regions[index].id);
-      if(selectedRegion) {
-        console.log('selectedRegion: ', selectedRegion);
-        this.selectedRegion = selectedRegion;
-      }
-    } else {
-      console.warn('allRegions.getValue() returned null')
-    }
+
+  onSelectRegion(region: Region) {
+    this.selectedParty = null;
+    this.selectedRegion = region;
   }
 
   onPartySelected(party: Party, event: Event) {
     event.stopPropagation();
+    this.selectedRegion = null;
     console.log('onPartySelected: ', party);
+    this.selectedParty = party;
   }
-  
+
+  getRegionExploredValue(): number {
+    const activities = this.getRegionActivities(this.selectedRegion);
+    const activity = activities.find(a => a.civilization_id === this.civilization.id);
+    if (activity) {
+      return activity.explored_percent;
+    }
+    else
+      return 0
+  }
+
+  getResourceImg(nameId: string) {
+    return this.supabase.getCashedImgUrl(nameId);
+  }
+
   ngOnDestroy(): void {
     this.engine.stopEngine();
     if (this.civSubscription$)

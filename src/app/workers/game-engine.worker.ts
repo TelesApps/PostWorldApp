@@ -6,7 +6,8 @@ import { Building } from "../interfaces/colony.interface";
 import { Continent } from "../interfaces/continents.interface";
 import { GameWorld } from "../interfaces/game-world.interface";
 import { RegionPlayerActivity } from "../interfaces/player_activity.interface";
-import { Party, Region } from "../interfaces/regions.interface";
+import { Region } from "../interfaces/regions.interface";
+import { Party } from "../interfaces/party.interface";
 import { ColonistActions } from "./colonist.functions";
 
 let gameSpeedMultiplier: number = 1;
@@ -33,6 +34,10 @@ function setIntervals(): void {
     // Every-second tasks
     //// PlayerActivity
     allPlayerActivity.forEach(activity => {
+      activity.parties.forEach(party => { 
+        // #TODO add logic that if party is exploring update the activity accordingly
+        activity.explored_percent += 0.1;
+       });
       const partyColonists = activity.parties.map(party => party.colonists).flat();
       const colonists = activity.colony.colonists;
       partyColonists.forEach(colonist => { ColonistActions.updateColonistPerSecond(colonist); });

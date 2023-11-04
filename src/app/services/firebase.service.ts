@@ -3,7 +3,8 @@ import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/compat
 import { GameWorld } from '../interfaces/game-world.interface';
 import { lastValueFrom } from 'rxjs';
 import { Continent } from '../interfaces/continents.interface';
-import { Party, Region } from '../interfaces/regions.interface';
+import { Region } from '../interfaces/regions.interface';
+import { Party } from '../interfaces/party.interface';
 import { Building } from '../interfaces/colony.interface';
 import { Colonist } from '../interfaces/colonist.interface';
 import { RegionPlayerActivity } from '../interfaces/player_activity.interface';

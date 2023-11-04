@@ -3,13 +3,14 @@ import { GameWorld, createWorldObj, TerrainType } from '../interfaces/game-world
 import { AirtableService } from './airtable.service';
 import { map, take } from 'rxjs';
 import { SupabaseService } from './supabase.service';
-import { Party, Region, createPartyObj, createRegionObj } from '../interfaces/regions.interface';
+import { Region, createRegionObj } from '../interfaces/regions.interface';
+import { Party, createPartyObj } from '../interfaces/party.interface';
 import { Continent, createContinentsObj } from '../interfaces/continents.interface';
 import { v4 as uuidv4 } from 'uuid';
 import { FirebaseService } from './firebase.service';
 import { Player } from '../interfaces/player.interface';
 import { Colonist, createColonistObj } from '../interfaces/colonist.interface';
-import { createRegionPlayerActivityObj } from '../interfaces/player_activity.interface';
+import { RegionPlayerActivity, createRegionPlayerActivityObj } from '../interfaces/player_activity.interface';
 import { Civilization, createCivilizationObj } from '../interfaces/civilization.interface';
 
 @Injectable({
@@ -90,7 +91,7 @@ export class GameCreationService {
   constructor(private airtabel: AirtableService, private supabase: SupabaseService) { }
 
   createWorld(player: Player, mapSize: string, mapType: string, seaLvl: string, hillLvl: string,
-    forestry: string, temperature: string, rainfall: string, gameName?: string): Promise<{world: GameWorld, civilization: Civilization}> {
+    forestry: string, temperature: string, rainfall: string, gameName?: string): Promise<{ world: GameWorld, civilization: Civilization }> {
     return this.supabase.getAllTerrainTypes().then((terrains) => {
       // #TODO add additional logic to add other Players and AI here
       console.log('res from Supabase', terrains);
@@ -119,7 +120,7 @@ export class GameCreationService {
       this.setRegionTerrainType(world, terrains);
       const civilization: Civilization = this.setPlayersStartingLocations(world);
       world.civilization_ids.push(civilization.id);
-      return {world, civilization};
+      return { world, civilization };
     }).catch((err) => {
       console.error('error from Supabase', err);
       return err;
@@ -194,16 +195,23 @@ export class GameCreationService {
     playerActivity.civilization_id = civilization.id;
     startingRegion.players_activity_ids.push(playerActivity.id);
     // Create Starting Colonist and Party
+    this.createInitialParty(world, startingRegion, playerActivity);
+    return civilization;
+  }
+
+  private createInitialParty(world: GameWorld, startingRegion: Region, playerActivity: RegionPlayerActivity) {
     const startingColonist: Colonist = createColonistObj(playerActivity.player_id, world.id,
       startingRegion.continent_id, startingRegion.id, uuidv4());
     const party: Party = createPartyObj(startingColonist.player_id, world.id, startingRegion.continent_id, startingRegion.id, uuidv4());
     startingColonist.assigned_party_id = party.id;
     party.colonist_ids.push(startingColonist.id);
     party.colonists.push(startingColonist);
+    // Assign Starting Resources
+    party.resources.push({ name_id: 'berries', amount: 20, operator: 'sum' });
+    party.resources.push({ name_id: 'wood', amount: 10, operator: 'sum' });
     playerActivity.party_ids.push(party.id);
     playerActivity.parties.push(party);
     startingRegion.players_activity.push(playerActivity);
-    return civilization;
   }
 
   private setRegionTerrainType(world: GameWorld, terrainList: TerrainType[]) {

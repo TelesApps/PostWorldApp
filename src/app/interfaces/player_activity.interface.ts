@@ -1,5 +1,5 @@
 import { Colony } from "./colony.interface";
-import { Party } from "./regions.interface";
+import { Party } from "./party.interface";
 
 export interface RegionPlayerActivity {
     id: string;

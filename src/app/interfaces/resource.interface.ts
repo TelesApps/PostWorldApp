@@ -3,17 +3,19 @@ export interface Resource {
     name_id: string;
     label: string;
     resource_type: string;
-    required_for: ResourceCalc[];
+    source: ResourceCalc[];
     labor_pc: number;
-    produced_amount: number;
+    yield_amount: number;
     spawn_rate: number;
     spoil_rate: number; // Number of seconds before one unit spoils.
-
+    techs_req: string[];
+    grow_time: number;
+    water_consumption: number;
 }
 
 export interface ResourceCalc {
     name_id: string;
     amount: number;
-    operator: 'add' | 'subtract' | 'sum'| 'multiply' | 'divide';
+    operator: 'sum'| 'add' | 'subtract' | 'multiply' | 'divide';
 }
 

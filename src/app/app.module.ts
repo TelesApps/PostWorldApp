@@ -18,6 +18,7 @@ import { AirtableService } from './services/airtable.service';
 import { HttpClientModule } from '@angular/common/http';
 import { SupabaseService } from './services/supabase.service';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { ResourceUiComponent } from './components/resource-ui/resource-ui.component';
 
 firebase.initializeApp(environment.firebaseConfig);
 

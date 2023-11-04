@@ -1,9 +1,18 @@
 .game {
     height: calc(100vh - 16px);
-    padding: 8px;
 }
 
 .hud {
+    background-color: var(--accent-lighter);
+    color: var(--accent-contrast-main);
+    padding: 4px;
+    margin-bottom: 12px;
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);
+}
+
+.hud-content {
+    width: clamp(380px, 94%, 1480px);
+    margin: auto;
     height: fit-content;
     margin-bottom: 8px;
     display: flex;
@@ -11,6 +20,8 @@
 }
 
 .game-world-container {
+    width: clamp(380px, 94%, 1480px);
+    margin: auto;
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap-reverse;
@@ -57,11 +68,11 @@
         position: absolute;
         top: -10px;
         left: 85%;
-        background-color: white;
+        background-color: var(--background-lighter);
         width: 35px;
         height: 35px;
         font-size: 13pt;
-        border: 1px solid black;
+        border: 1px solid var(--foreground-main);
         border-radius: 50%;
         box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);
         display: flex;
@@ -107,13 +118,64 @@ mat-progress-bar {
     border-bottom-left-radius: 50% 25px;
 }
 
-.details-container {
-    border: 1px solid black;
-}
-
 .close-btn {
     text-align: end;
     position: relative;
     top: -12px;
     right: -6px;
+    height: 0px;
+    display: flex;
+    justify-content: flex-end;
+    .btn{
+        padding: 0px;
+        width: 25px;
+        height: 25px;
+        border-radius: 8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: var(--warn-main);
+        color: var(--warn-contrast-main);
+        box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);
+        cursor: pointer;
+    }
+}
+
+.selected-region {
+    display: flex;
+    flex-direction: column;
+    padding: 16px 8px 8px 8px;
+    background-color: var(--background-lighter);
+    border: 1px solid var(--foreground-main);
+    border-radius: 8px;
+    .resources {
+        text-align: center;
+    }
+}
+
+.selected-party-container {
+    display: flex;
+    flex-direction: column;
+    padding: 16px 8px 8px 8px;
+    background-color: var(--background-lighter);
+    border: 1px solid var(--foreground-main);
+    border-radius: 8px;
+    .party-header {
+        display: flex;
+        justify-content: space-between;
+    }
+    .party-stats {
+        text-align: center;
+        background-color: var(--background-darker);
+    }
+    .party-btns {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 8px;
+        button {
+            margin: 4px;
+            width: clamp(80px, 45%, 280px);
+        }
+    }
 }

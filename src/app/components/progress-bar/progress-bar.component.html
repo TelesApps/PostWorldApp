@@ -1,5 +1,5 @@
 <div class="container">
-    <mat-progress-bar [mode]="mode" [value]="value" [color]="color" [bufferValue]="bufferValue">
+    <mat-progress-bar [mode]="mode" [value]="value * multiplier" [color]="color" [bufferValue]="bufferValue" max="1">
     </mat-progress-bar>
-    <div class="progress-text">55</div>
+    <div [style]="'color:' + textColor" class="progress-text">{{ text | percent: '1.1-2' }}</div>
 </div>

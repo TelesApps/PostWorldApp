@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { GameWorld } from '../interfaces/game-world.interface';
 import { BehaviorSubject } from 'rxjs';
-import { Party, Region } from '../interfaces/regions.interface';
+import { Region } from '../interfaces/regions.interface';
+import { Party } from '../interfaces/party.interface';
 import { Continent } from '../interfaces/continents.interface';
 import { Building } from '../interfaces/colony.interface';
 import { Colonist } from '../interfaces/colonist.interface';

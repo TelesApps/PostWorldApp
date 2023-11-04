@@ -45,6 +45,10 @@ $postWorld-dark-theme: mat-dark-theme(
     --background-main: #{map-get($postWorld-background, main)};
     --background-lighter: #{map-get($postWorld-background, lighter)};
     --background-darker: #{map-get($postWorld-background, darker)};
+    // save main contrast colors for later use
+    --primary-contrast-main: #{map-get(map-get($postWorld-primary, contrast), main)};
+    --accent-contrast-main: #{map-get(map-get($postWorld-accent, contrast), main)};
+    --warn-contrast-main: #{map-get(map-get($postWorld-warn, contrast), main)};
 }
 // Sets the Default theme to light
 body {

@@ -1,16 +1,20 @@
 <div class="game" *ngIf="civilization">
     <div class="hud">
-        <div class="world-explored">
-            <div>World Explored</div>
-            <div *ngIf="civilization.explored_perspective !== null">{{civilization.explored_perspective}}%</div>
-            Game Time/Date {{ gametime }}
-        </div>
-        <div class="civ-resources">
-            <div>Resources being tracked</div>
-            <mat-icon aria-hidden="false" aria-label="Example home icon">menu</mat-icon>
-        </div>
-        <div class="menu-btns">
-            <button mat-raised-button color="primary" routerLink="/">Menu</button>
+        <div class="hud-content">
+            <div class="world-explored">
+                <div>World Explored</div>
+                <div *ngIf="civilization.explored_perspective !== null">{{civilization.explored_perspective}}%</div>
+                Game Time/Date {{ gametime }}
+            </div>
+            <div class="civ-resources">
+                <div>Resources being tracked</div>
+                <mat-icon aria-hidden="false" aria-label="Example home icon">menu</mat-icon>
+            </div>
+            <div class="menu-btns">
+                <button mat-raised-button color="primary" routerLink="/">Menu</button>
+                <button style="margin-left: 8px;" mat-raised-button color="primary"
+                    (click)="testChangeTheme()">Theme</button>
+            </div>
         </div>
     </div>
     <div class="game-world-container">
@@ -25,8 +29,9 @@
                     <b>Discovered Regions</b>
                 </div>
                 <div *ngIf="civilization" class="regions-list">
-                    <div class="region borders" *ngFor="let region of civilization.discovered_regions let i = index"
-                        (click)="onSelectRegion(i)">
+                    <div class="region borders" *ngFor="let region of civilization.discovered_regions"
+                        [ngClass]="selectedRegion && region.id === selectedRegion.id? 'isSelected':''"
+                        (click)="onSelectRegion(region)">
                         <div class="region-type">{{ region.terrain_type.label }}</div>
                         <div class="temperature">68f</div>
                         <div class="region-content">
@@ -40,6 +45,7 @@
                                 <div class="activity" *ngFor="let activity of playersActivity">
                                     <div class="party-list" *ngIf="activity.region_id === region.id">
                                         <div class="party" *ngFor="let party of activity.parties"
+                                            [ngClass]="selectedParty && party.id === selectedParty.id? 'isSelected':''"
                                             (click)="onPartySelected(party, $event)">
                                             <mat-icon aria-hidden="false" aria-label="Party icon"
                                                 color="primary">groups</mat-icon>
@@ -55,19 +61,41 @@
         <div class="details-area">
             <div class="details-container">
                 <div class="close-btn">
-                    <button mat-mini-fab color="warn">
-                        <mat-icon aria-hidden="false" aria-label="Example home icon">close</mat-icon>
-                    </button>
+                    <div class="btn">
+                        <mat-icon aria-hidden="false" aria-label="Close Button">close</mat-icon>
+                    </div>
                 </div>
                 <div class="no-selection">
                 </div>
-                <div class="selected-region">
-                    <!-- mode = 'determinate' , 'indeterminate' , 'buffer' , 'query' -->
-                    <app-progress-bar [value]="50"></app-progress-bar>
-                    <span>90</span>
+                <div *ngIf="selectedRegion && getRegionExploredValue() as exploreValue" class="selected-region">
+                    <app-progress-bar [value]="exploreValue" [text]="exploreValue.toString()"></app-progress-bar>
+                    <button mat-raised-button color="primary">View Region</button>
+                    <div class="resources">
+                        <h4>List of Resources</h4>
+                    </div>
                 </div>
-                <div class="selected-party">
-
+                <div *ngIf="selectedParty" class="selected-party-container">
+                    <div class="party-header">
+                        <div style="flex-grow: 1;">Party Name</div>
+                        <app-progress-bar style="flex-grow: 2;" [value]="0"></app-progress-bar>
+                    </div>
+                    <div class="party-stats">
+                        <div>Combat Stats</div>
+                        <div class="party-resources-list">
+                            <div class="resource" *ngFor="let resource of selectedParty.resources">
+                                <app-resource-ui [nameId]="resource.name_id" [text]="resource.amount"></app-resource-ui>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="party-img">
+                        <!-- <img src="*" alt="character image" srcset=""> -->
+                    </div>
+                    <div class="party-btns">
+                        <button mat-raised-button color="primary">Explore</button>
+                        <button mat-raised-button color="primary">Settle</button>
+                        <button mat-raised-button color="primary">Attack</button>
+                        <button mat-raised-button color="primary">Split Party</button>
+                    </div>
                 </div>
             </div>
         </div>

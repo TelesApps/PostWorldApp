@@ -12,17 +12,21 @@ body {
 }
 
 .borders {
-    border: 1px solid black;
+    border: 1px solid var(--foreground-main);
     border-radius: 8px;
 }
 
 .party {
     width: 45px;
     height: 45px;
-    border: 1px solid black;
+    border: 1px solid var(--foreground-main);
     border-radius: 50%;
     box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.isSelected {
+    border: 2px solid var(--accent-darker);
 }
