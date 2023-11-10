@@ -30,3 +30,6 @@ body {
 .isSelected {
     border: 2px solid var(--accent-darker);
 }
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
