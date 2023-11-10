@@ -8,30 +8,38 @@ import { SupabaseService } from 'src/app/services/supabase.service';
 })
 export class ResourceUiComponent implements OnInit {
 
-  placeholder = 'https://rdetkrgymjviyiabmphl.supabase.co/storage/v1/object/public/Resource_Images/Cooking_52_spice.png?t=2023-11-04T15%3A56%3A19.162Z'
+  placeholder: string = '/assets/images/resource-any.png'
   @Input() nameId: string;
   @Input() srcset?: string = '';
   @Input() alt?: string = 'resource icon';
   @Input() text: string | number = '';
+  @Input() width: string = '40px';
+  @Input() tooltip: string = '';
+  @Input() tooltipPosition: any = 'above';
+
   imgUrl: string = '';
 
   constructor(private supabase: SupabaseService) { }
 
   ngOnInit(): void {
+    this.setResource();
+  }
+
+  async setResource() {
     if (this.nameId) {
-      const imgUrl = this.supabase.getCashedImgUrl(this.nameId);
-      if (imgUrl) {
-        this.imgUrl = imgUrl;
-      } else {
-        this.supabase.getResourceUrlFromCloud(this.nameId).then(url => {
-          if (url)
-            this.imgUrl = url;
-          else
-            this.imgUrl = this.placeholder;
-        });
+      const resource = await this.supabase.getResource(this.nameId);
+      if (resource) {
+        if (resource.img_url) {
+          this.imgUrl = resource.img_url;
+        } else {
+          this.imgUrl = this.placeholder;
+        }
+        if(resource.label) {
+          this.tooltip = resource.label;
+          this.alt = resource.label;
+        }
       }
     }
-
   }
 
 }

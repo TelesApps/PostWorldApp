@@ -11,6 +11,7 @@ export interface Resource {
     techs_req: string[];
     grow_time: number;
     water_consumption: number;
+    img_url: string;
 }
 
 export interface ResourceCalc {

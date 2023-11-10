@@ -168,6 +168,12 @@ mat-progress-bar {
         text-align: center;
         background-color: var(--background-darker);
     }
+    .party-resources-list {
+        display: flex;
+        .resource {
+            margin: 2px;
+        }
+    }
     .party-btns {
         display: flex;
         justify-content: center;

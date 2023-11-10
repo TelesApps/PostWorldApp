@@ -111,10 +111,6 @@ export class GameWorldComponent implements OnInit, OnDestroy {
       return 0
   }
 
-  getResourceImg(nameId: string) {
-    return this.supabase.getCashedImgUrl(nameId);
-  }
-
   ngOnDestroy(): void {
     this.engine.stopEngine();
     if (this.civSubscription$)

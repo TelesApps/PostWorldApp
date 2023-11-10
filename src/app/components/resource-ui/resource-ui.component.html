@@ -1,5 +1,13 @@
-<div class="container">
-    <img [src]="imgUrl" [alt]="alt" [srcset]="srcset">
+<div class="container" [matTooltip]="tooltip" [matTooltipPosition]="tooltipPosition">
+    @defer (when imgUrl) {
+        <div [style]="{'width': width, 'height': width}">
+            <img width="100%" [src]="imgUrl" [alt]="alt" [srcset]="srcset">
+        </div>
+    } @placeholder {
+        <div [style]="{'width': width, 'height': width}">
+            <img width="100%" [src]="placeholder" alt="">
+        </div>
+    }
     <div class="amount">
         {{ text }}
     </div>

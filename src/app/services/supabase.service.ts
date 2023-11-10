@@ -19,6 +19,7 @@ export class SupabaseService {
 
   private supabase: SupabaseClient
   private url_cashe: Map<string, string> = new Map();
+  private resources_cashe: Map<string, Resource> = new Map();
 
   constructor() {
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey)
@@ -51,29 +52,21 @@ export class SupabaseService {
     }
   }
 
-  public getCashedImgUrl(nameId: string): string {
-    const url = this.url_cashe.get(nameId);
-    if (url) {
-      return url;
+  async getResource(nameId: string): Promise<Resource> {
+    // Get resource from cashe first if available
+    const resource = this.resources_cashe.get(nameId);
+    if (resource) {
+      return resource;
     } else {
-      return '';
-    }
-  }
-
-  // get resource URL from cashe, if its not available get it from cloud and add it to cashe
-  async getResourceUrlFromCloud(nameId: string): Promise<string> {
-    console.log('Calling Cloud for resource: ', nameId);
-    const promiseData = (await this.supabase.from('Resource Library').select('img_url').eq('name_id', nameId)).data;
-    if (promiseData && promiseData[0]) {
+      const promiseData = (await this.supabase.from('Resource Library').select('*').eq('name_id', nameId)).data;
       console.log('promiseData from supabase: ', promiseData);
-      if (promiseData[0].img_url)
-        this.url_cashe.set(nameId, promiseData[0].img_url);
-      return promiseData[0].img_url;
-    } else {
-      throw new Error('No Resources found');
+      if (promiseData && promiseData[0]) {
+        this.resources_cashe.set(nameId, promiseData[0]);
+        return promiseData[0];
+      } else {
+        throw new Error('No Resources found');
+      }
     }
-
-
   }
 
 

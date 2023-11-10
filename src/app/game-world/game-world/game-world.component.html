@@ -82,9 +82,11 @@
                     <div class="party-stats">
                         <div>Combat Stats</div>
                         <div class="party-resources-list">
-                            <div class="resource" *ngFor="let resource of selectedParty.resources">
-                                <app-resource-ui [nameId]="resource.name_id" [text]="resource.amount"></app-resource-ui>
-                            </div>
+                            @for (resource of selectedParty.resources; track $index) {
+                              <div class="resource">
+                                  <app-resource-ui [nameId]="resource.name_id" [text]="resource.amount"></app-resource-ui>
+                              </div>
+                            }
                         </div>
                     </div>
                     <div class="party-img">
