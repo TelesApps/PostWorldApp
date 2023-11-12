@@ -1,6 +1,6 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, WritableSignal, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { skip, take, Subscription } from 'rxjs';
+import { skip, take, Subscription, BehaviorSubject, ReplaySubject } from 'rxjs';
 import { Civilization } from 'src/app/interfaces/civilization.interface';
 import { GameWorld } from 'src/app/interfaces/game-world.interface';
 import { Player } from 'src/app/interfaces/player.interface';
@@ -23,7 +23,8 @@ export class GameWorldComponent implements OnInit, OnDestroy {
 
   civilization: Civilization
   civSubscription$: Subscription;
-  playersActivity: RegionPlayerActivity[];
+  selectedSubscription$: Subscription;
+  allPlayersActivity: RegionPlayerActivity[];
 
   playersActivitySub$: Subscription;
   selectedRegion: Region;
@@ -49,7 +50,7 @@ export class GameWorldComponent implements OnInit, OnDestroy {
       this.gametime++;
     });
     this.playersActivitySub$ = this.engine.allPlayerActivity.subscribe(pa => {
-      this.playersActivity = pa;
+      this.allPlayersActivity = pa;
     });
 
     this.testDevelopment();
@@ -63,10 +64,10 @@ export class GameWorldComponent implements OnInit, OnDestroy {
         console.log('this.civilization: ', this.civilization);
       });
     }
-    if (!this.playersActivity) {
+    if (!this.allPlayersActivity) {
       this.firebase.getAllPlayerActivity("claudioteles85@gmail.com_1699101872452").then(pa => {
         this.engine.allPlayerActivity.next(pa);
-        console.log('this.playersActivity: ', this.playersActivity);
+        console.log('this.playersActivity: ', this.allPlayersActivity);
       });
     }
   }
@@ -82,12 +83,21 @@ export class GameWorldComponent implements OnInit, OnDestroy {
   }
 
   getRegionActivities(region: Region): RegionPlayerActivity[] {
-    if (this.playersActivity) {
-      return this.playersActivity.filter(pa => pa.region_id === region.id);
+    if (this.allPlayersActivity) {
+      return this.allPlayersActivity.filter(pa => pa.region_id === region.id);
     }
     else return null;
   }
 
+  getPartyActivities() {
+    if (this.selectedParty) {
+      const playerActivity = this.allPlayersActivity.find(pa => pa.civilization_id === this.civilization.id);
+      const party = playerActivity.parties.find(p => p.id === this.selectedParty.id);
+      this.selectedParty = party;
+      return party;
+    }
+    return null;
+  }
 
   onSelectRegion(region: Region) {
     this.selectedParty = null;
@@ -109,6 +119,13 @@ export class GameWorldComponent implements OnInit, OnDestroy {
     }
     else
       return 0
+  }
+
+  onPartyAction(action: string) {
+    console.log('onPartyAction: ', action);
+    if (action === 'explore') {
+      this.selectedParty.activity = 'exploring';
+    }
   }
 
   ngOnDestroy(): void {

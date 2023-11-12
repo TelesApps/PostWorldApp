@@ -9,6 +9,8 @@ import { RegionPlayerActivity } from "../interfaces/player_activity.interface";
 import { Region } from "../interfaces/regions.interface";
 import { Party } from "../interfaces/party.interface";
 import { ColonistActions } from "./colonist.functions";
+import { Resource } from "../interfaces/resource.interface";
+import { PartyActions } from "./party.functions";
 
 let gameSpeedMultiplier: number = 1;
 
@@ -16,14 +18,13 @@ let everySecondInterval: number;
 let everyThirtySecondsInterval: number;
 let everyNinetyInterval: number;
 
+let resourceLibrary: Resource[];
 let gameWorld: GameWorld;
 let playerCivilization: Civilization;
 let allContinents: Continent[];
 let allRegions: Region[];
-// let allParties: Party[];
 let allPlayerActivity: RegionPlayerActivity[];
 let allBuildings: Building[];
-// let allColonists: Colonist[];
 
 function setIntervals(): void {
   clearInterval(everySecondInterval);
@@ -34,9 +35,9 @@ function setIntervals(): void {
     // Every-second tasks
     //// PlayerActivity
     allPlayerActivity.forEach(activity => {
-      activity.parties.forEach(party => { 
-        // #TODO add logic that if party is exploring update the activity accordingly
-        activity.explored_percent += 0.1;
+      activity.explored_percent += 0.1;
+      activity.parties.forEach(party => {
+        PartyActions.updatePartyPerSecond(party, allRegions, resourceLibrary);
        });
       const partyColonists = activity.parties.map(party => party.colonists).flat();
       const colonists = activity.colony.colonists;
@@ -67,11 +68,11 @@ self.onmessage = (event: MessageEvent) => {
   switch (event.data.type) {
     case 'INIT_WORLD':
       // Initialize the game world
+      resourceLibrary = event.data.payload.resourceLibrary;
       gameWorld = event.data.payload.gameWorld;
       playerCivilization = event.data.payload.playerCivilization;
       allContinents = event.data.payload.allContinents;
       allRegions = event.data.payload.allRegions;
-      // allParties = event.data.payload.allParties;
       allPlayerActivity = event.data.payload.allPlayerActivity;
       allBuildings = event.data.payload.allBuildings;
       break;

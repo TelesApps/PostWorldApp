@@ -8,6 +8,7 @@ import { Building } from '../interfaces/colony.interface';
 import { Colonist } from '../interfaces/colonist.interface';
 import { RegionPlayerActivity } from '../interfaces/player_activity.interface';
 import { Civilization } from '../interfaces/civilization.interface';
+import { Resource } from '../interfaces/resource.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -29,14 +30,14 @@ export class EngineService {
 
   }
 
-  public startEngine(gameWorld: GameWorld, playerCivilization: Civilization, allContinents: Continent[], allRegions: Region[], allParties: Party[],
+  public startEngine(resourceLibrary: Resource[], gameWorld: GameWorld, playerCivilization: Civilization, allContinents: Continent[], allRegions: Region[], allParties: Party[],
     allPlayerActivity: RegionPlayerActivity[], allBuildings: Building[], allColonists: Colonist[]): void {
     // initialize the worker if it hasn't been already
     if (!this.worker)
       this.initializeWorker();
     this.worker.postMessage({
       type: 'INIT_WORLD', payload: {
-        gameWorld, playerCivilization, allContinents, allRegions, allParties, allPlayerActivity, allBuildings
+        resourceLibrary, gameWorld, playerCivilization, allContinents, allRegions, allParties, allPlayerActivity, allBuildings
       }
     });
   }

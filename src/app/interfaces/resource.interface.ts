@@ -2,7 +2,7 @@ export interface Resource {
     library_id: string;
     name_id: string;
     label: string;
-    resource_type: string;
+    resource_type: 'material' | 'food' | 'equipment';
     source: ResourceCalc[];
     labor_pc: number;
     yield_amount: number;

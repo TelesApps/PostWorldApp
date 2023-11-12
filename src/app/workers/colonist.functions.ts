@@ -27,7 +27,7 @@ function updateColonistPerNinetySeconds(colonist: Colonist) {
 function colonistEats(colonist: Colonist, colony: Colony) {
     // Figure out if colonist is in a party or not
     if (colonist.assigned_party_id) {
-        // #TODO figure out how to handle food and party logic
+        // Party logic handles food consumption nothing else goes here
     } else {
         // Add logic here to extract a food type resource from the colony
 

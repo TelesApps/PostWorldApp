@@ -41,8 +41,8 @@
                                 <div>Water Level</div>
                                 <div>Resources</div>
                             </div>
-                            <div *ngIf="region.has_player_activity && playersActivity && playersActivity.length > 0">
-                                <div class="activity" *ngFor="let activity of playersActivity">
+                            <div *ngIf="region.has_player_activity && allPlayersActivity && allPlayersActivity.length > 0">
+                                <div class="activity" *ngFor="let activity of allPlayersActivity">
                                     <div class="party-list" *ngIf="activity.region_id === region.id">
                                         <div class="party" *ngFor="let party of activity.parties"
                                             [ngClass]="selectedParty && party.id === selectedParty.id? 'isSelected':''"
@@ -74,31 +74,33 @@
                         <h4>List of Resources</h4>
                     </div>
                 </div>
-                <div *ngIf="selectedParty" class="selected-party-container">
-                    <div class="party-header">
-                        <div style="flex-grow: 1;">Party Name</div>
-                        <app-progress-bar style="flex-grow: 2;" [value]="0"></app-progress-bar>
-                    </div>
-                    <div class="party-stats">
-                        <div>Combat Stats</div>
-                        <div class="party-resources-list">
-                            @for (resource of selectedParty.resources; track $index) {
-                              <div class="resource">
-                                  <app-resource-ui [nameId]="resource.name_id" [text]="resource.amount"></app-resource-ui>
-                              </div>
-                            }
+                @if(selectedParty && getPartyActivities(); as party) {
+                    <div class="selected-party-container">
+                        <div class="party-header">
+                            <div style="flex-grow: 1;">Party Name</div>
+                            <app-progress-bar style="flex-grow: 2;" [value]="0"></app-progress-bar>
+                        </div>
+                        <div class="party-stats">
+                            <div>Combat Stats</div>
+                            <div class="party-resources-list">
+                                @for (resource of party.resources; track $index) {
+                                  <div class="resource">
+                                      <app-resource-ui [nameId]="resource.name_id" [text]="resource.amount"></app-resource-ui>
+                                  </div>
+                                }
+                            </div>
+                        </div>
+                        <div class="party-img">
+                            <!-- <img src="*" alt="character image" srcset=""> -->
+                        </div>
+                        <div class="party-btns">
+                            <button mat-raised-button color="primary">Explore</button>
+                            <button mat-raised-button color="primary">Settle</button>
+                            <button mat-raised-button color="primary">Attack</button>
+                            <button mat-raised-button color="primary">Split Party</button>
                         </div>
                     </div>
-                    <div class="party-img">
-                        <!-- <img src="*" alt="character image" srcset=""> -->
-                    </div>
-                    <div class="party-btns">
-                        <button mat-raised-button color="primary">Explore</button>
-                        <button mat-raised-button color="primary">Settle</button>
-                        <button mat-raised-button color="primary">Attack</button>
-                        <button mat-raised-button color="primary">Split Party</button>
-                    </div>
-                </div>
+                }
             </div>
         </div>
     </div>

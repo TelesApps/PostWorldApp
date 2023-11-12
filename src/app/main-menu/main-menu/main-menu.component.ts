@@ -38,6 +38,7 @@ export class MainMenuComponent implements OnInit {
     private GC: GameCreationService,
     private auth: AuthService,
     private firebase: FirebaseService,
+    private supabase: SupabaseService,
     private router: Router,
     private engine: EngineService,
     public storage: StorageService) { }
@@ -61,8 +62,8 @@ export class MainMenuComponent implements OnInit {
     if (this.player) {
       const creation: { world: GameWorld, civilization: Civilization } = await this.GC.createWorld(
         this.player, this.mapSize, this.mapType, this.seaLvl, this.hillLvl, this.forestry, this.temperature, this.rainfall);
-        this.world = creation.world;
-        console.log('game world created', this.world);
+      this.world = creation.world;
+      console.log('game world created', this.world);
       console.log('saving to firebase');
       await this.firebase.saveGame(creation.world);
       await this.firebase.saveCivilization(creation.civilization);
@@ -82,8 +83,10 @@ export class MainMenuComponent implements OnInit {
     const allBuildings = await this.firebase.getAllBuildings(gameWorld.id);
     const allColonists = await this.firebase.getAllColonists(gameWorld.id);
     const playerCivilization = await this.firebase.getPlayerCivilization(gameWorld.id, this.player.player_id);
+    const resourceLibrary = await this.supabase.getAllResources();
 
-    this.engine.startEngine(gameWorld, playerCivilization, allContinents, allRegions, allParties, allPlayerActivity, allBuildings, allColonists);
+    this.engine.startEngine(resourceLibrary, gameWorld, playerCivilization, allContinents, allRegions,
+      allParties, allPlayerActivity, allBuildings, allColonists);
     this.router.navigate(['/game-world']);
 
     // this.firebase.loadGame(game.id).then((world) => {
