@@ -58,6 +58,7 @@
                 </div>
             </div>
         </div>
+        <!-- ************ Menu Details Area ************ -->
         <div class="details-area">
             <div class="details-container">
                 <div class="close-btn">
@@ -68,7 +69,7 @@
                 <div class="no-selection">
                 </div>
                 <div *ngIf="selectedRegion && getRegionExploredValue() as exploreValue" class="selected-region">
-                    <app-progress-bar [value]="exploreValue" [text]="exploreValue.toString()"></app-progress-bar>
+                    <app-progress-bar [value]="exploreValue" [text]="exploreValue.toString()" [textType]="'percent'"></app-progress-bar>
                     <button mat-raised-button color="primary">View Region</button>
                     <div class="resources">
                         <h4>List of Resources</h4>
@@ -78,7 +79,7 @@
                     <div class="selected-party-container">
                         <div class="party-header">
                             <div style="flex-grow: 1;">Party Name</div>
-                            <app-progress-bar style="flex-grow: 2;" [value]="0"></app-progress-bar>
+                            <app-progress-bar style="flex-grow: 2;" [value]="party.activity_progress" [text]="party.activity"></app-progress-bar>
                         </div>
                         <div class="party-stats">
                             <div>Combat Stats</div>
@@ -94,7 +95,7 @@
                             <!-- <img src="*" alt="character image" srcset=""> -->
                         </div>
                         <div class="party-btns">
-                            <button mat-raised-button color="primary">Explore</button>
+                            <button mat-raised-button color="primary" (click)="onPartyExplore(party)">Explore</button>
                             <button mat-raised-button color="primary">Settle</button>
                             <button mat-raised-button color="primary">Attack</button>
                             <button mat-raised-button color="primary">Split Party</button>

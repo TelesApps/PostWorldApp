@@ -1,5 +1,9 @@
 <div class="container">
     <mat-progress-bar [mode]="mode" [value]="value * multiplier" [color]="color" [bufferValue]="bufferValue" max="1">
     </mat-progress-bar>
-    <div [style]="'color:' + textColor" class="progress-text">{{ text | percent: '1.1-2' }}</div>
+    @if (textType === 'percent') {
+        <div [style]="'color:' + textColor" class="progress-text">{{ text | percent: '1.1-2' }}</div>
+    } @else {
+        <div [style]="'color:' + textColor" class="progress-text">{{ text | uppercase }}</div>
+    }
 </div>

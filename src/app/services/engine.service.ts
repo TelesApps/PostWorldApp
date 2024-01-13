@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { GameWorld } from '../interfaces/game-world.interface';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { Region } from '../interfaces/regions.interface';
 import { Party } from '../interfaces/party.interface';
 import { Continent } from '../interfaces/continents.interface';
@@ -18,16 +18,40 @@ export class EngineService {
   private worker: Worker;
   private gameSpeedMultiplier: number = .25; // Default to normal speed
 
-  gameWorld: BehaviorSubject<GameWorld> = new BehaviorSubject<GameWorld>(null);
-  civilization: BehaviorSubject<Civilization> = new BehaviorSubject<Civilization>(null);
-  allContinents: BehaviorSubject<Continent[]> = new BehaviorSubject<Continent[]>(null);
-  allRegions: BehaviorSubject<Region[]> = new BehaviorSubject<Region[]>(null);
+  private gameWorld: BehaviorSubject<GameWorld> = new BehaviorSubject<GameWorld>(null);
+  private civilization: BehaviorSubject<Civilization> = new BehaviorSubject<Civilization>(null);
+  private allContinents: BehaviorSubject<Continent[]> = new BehaviorSubject<Continent[]>(null);
+  private allRegions: BehaviorSubject<Region[]> = new BehaviorSubject<Region[]>(null);
   // allParties: BehaviorSubject<Party[]> = new BehaviorSubject<Party[]>(null);
-  allPlayerActivity: BehaviorSubject<RegionPlayerActivity[]> = new BehaviorSubject<RegionPlayerActivity[]>(null);
-  allBuildings: BehaviorSubject<Building[]> = new BehaviorSubject<Building[]>(null);
+  private allPlayerActivity: BehaviorSubject<RegionPlayerActivity[]> = new BehaviorSubject<RegionPlayerActivity[]>(null);
+  private allBuildings: BehaviorSubject<Building[]> = new BehaviorSubject<Building[]>(null);
 
   constructor() {
 
+  }
+
+  testNextAllPlayerActivity(pa: RegionPlayerActivity[]) {
+    this.allPlayerActivity.next(pa);
+  }
+
+  // Let's add a method to get the observable for all of the private BehaviorSubjects
+  public getGameWorld(): Observable<GameWorld> {
+    return this.gameWorld;
+  }
+  public getCivilization(): Observable<Civilization> {
+    return this.civilization;
+  }
+  public getAllContinents(): Observable<Continent[]> {
+    return this.allContinents;
+  }
+  public getAllRegions(): Observable<Region[]> {
+    return this.allRegions;
+  }
+  public getAllPlayerActivity(): Observable<RegionPlayerActivity[]> {
+    return this.allPlayerActivity;
+  }
+  public getAllBuildings(): Observable<Building[]> {
+    return this.allBuildings;
   }
 
   public startEngine(resourceLibrary: Resource[], gameWorld: GameWorld, playerCivilization: Civilization, allContinents: Continent[], allRegions: Region[], allParties: Party[],
@@ -40,6 +64,10 @@ export class EngineService {
         resourceLibrary, gameWorld, playerCivilization, allContinents, allRegions, allParties, allPlayerActivity, allBuildings
       }
     });
+  }
+
+  public updateAllPlayerActivity(allPlayerActivity: RegionPlayerActivity[]): void {
+    this.sendUpdateToWorker('UPDATE_ALL_PLAYER_ACTIVITY', allPlayerActivity);
   }
 
   private initializeWorker(): void {
@@ -72,8 +100,12 @@ export class EngineService {
   }
 
   // Let's also add a method to send data to the worker, for instance to update the state based on UI interactions
-  private sendUpdateToWorker(payload: any): void {
-    this.worker.postMessage({ type: 'UPDATE_STATE', payload });
+  private sendUpdateToWorker(type: 'UPDATE_ALL_PLAYER_ACTIVITY', payload: any): void {
+    if (this.worker)
+      this.worker.postMessage({ type, payload });
+    else {
+      console.error('Worker not initialized');
+    }
   }
 
   // And potentially a method to terminate the worker if needed, e.g., if the game ends

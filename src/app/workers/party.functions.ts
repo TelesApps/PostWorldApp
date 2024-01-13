@@ -1,4 +1,5 @@
 import { Party } from "../interfaces/party.interface";
+import { RegionPlayerActivity } from "../interfaces/player_activity.interface";
 import { Region } from "../interfaces/regions.interface";
 import { Resource } from "../interfaces/resource.interface";
 
@@ -10,10 +11,11 @@ export class PartyActions {
 
 
 // EVERY SECOND
-function updatePartyPerSecond(party: Party, allRegions?: Region[], resourceLibrary?: Resource[]) {
+function updatePartyPerSecond(activity: RegionPlayerActivity, party: Party, allRegions?: Region[], resourceLibrary?: Resource[]) {
     partyEats(party, resourceLibrary);
     if(party.activity === 'exploring') {
-        
+        activity.explored_percent += 0.01;
+        party.activity_progress += 0.01;
     }
 }
 

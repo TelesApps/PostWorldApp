@@ -35,9 +35,8 @@ function setIntervals(): void {
     // Every-second tasks
     //// PlayerActivity
     allPlayerActivity.forEach(activity => {
-      activity.explored_percent += 0.1;
       activity.parties.forEach(party => {
-        PartyActions.updatePartyPerSecond(party, allRegions, resourceLibrary);
+        PartyActions.updatePartyPerSecond(activity, party, allRegions, resourceLibrary);
        });
       const partyColonists = activity.parties.map(party => party.colonists).flat();
       const colonists = activity.colony.colonists;
@@ -84,5 +83,8 @@ self.onmessage = (event: MessageEvent) => {
       // Handle state updates sent from the main thread
       break;
     // Handle other types of messages here
+    case 'UPDATE_ALL_PLAYER_ACTIVITY':
+      allPlayerActivity = event.data.payload;
+      break;
   }
 };

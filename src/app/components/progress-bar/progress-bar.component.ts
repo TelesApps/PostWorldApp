@@ -17,6 +17,7 @@ export class ProgressBarComponent implements OnInit {
 
   @Input() textColor = 'var(--primary-contrast-main)';
   @Input() text: string = '';
+  @Input() textType: 'percent' | 'text' = 'text';
 
   multiplier = 1;
 
@@ -25,9 +26,15 @@ export class ProgressBarComponent implements OnInit {
 
   ngOnInit(): void {
     if (!this.text) {
-      this.text = this.value.toString();
+      if (this.value) {
+        this.textType = 'percent';
+        this.text = this.value.toString();
+      }
+      else {
+        this.text = '0';
+      }
     }
-    if(this.valueType === 'percent') {
+    if (this.valueType === 'percent') {
       this.multiplier = 100;
     }
   }

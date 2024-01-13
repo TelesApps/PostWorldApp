@@ -45,11 +45,12 @@ export class GameWorldComponent implements OnInit, OnDestroy {
 
   async loadGameState() {
     let player: Player = await this.auth.getPlayer();
-    this.civSubscription$ = this.engine.civilization.subscribe(civ => {
+    this.civSubscription$ = this.engine.getCivilization().subscribe(civ => {
       this.civilization = civ;
       this.gametime++;
     });
-    this.playersActivitySub$ = this.engine.allPlayerActivity.subscribe(pa => {
+    this.playersActivitySub$ = this.engine.getAllPlayerActivity().subscribe(pa => {
+      console.log('pa: ', pa);  
       this.allPlayersActivity = pa;
     });
 
@@ -59,14 +60,15 @@ export class GameWorldComponent implements OnInit, OnDestroy {
   testDevelopment() {
     // Use this function to load game durring development
     if (!this.civilization) {
-      this.firebase.getCivilizationWithId('d00ce21e-a525-482d-970b-761bb4874fbf').then(civ => {
+      this.firebase.getCivilizationWithId('f53ad276-302a-4816-92bf-591bc52bc4b3').then(civ => {
         this.civilization = civ;
         console.log('this.civilization: ', this.civilization);
       });
     }
     if (!this.allPlayersActivity) {
-      this.firebase.getAllPlayerActivity("claudioteles85@gmail.com_1699101872452").then(pa => {
-        this.engine.allPlayerActivity.next(pa);
+      this.firebase.getAllPlayerActivity("claudioteles85@gmail.com_1705161982853").then(pa => {
+        this.engine.updateAllPlayerActivity(pa);
+        this.engine.testNextAllPlayerActivity(pa);
         console.log('this.playersActivity: ', this.allPlayersActivity);
       });
     }
@@ -111,8 +113,18 @@ export class GameWorldComponent implements OnInit, OnDestroy {
     this.selectedParty = party;
   }
 
+  onPartyExplore(party: Party) {
+    const playerActivity = this.allPlayersActivity.find(pa => pa.civilization_id === this.civilization.id);
+    const partyActivity = playerActivity.parties.find(p => p.id === party.id);
+    partyActivity.activity = 'exploring';
+    partyActivity.activity_progress = playerActivity.explored_percent;
+    console.log('this.allPlayersActivity: ', this.allPlayersActivity);
+    this.engine.updateAllPlayerActivity(this.allPlayersActivity);
+  }
+
   getRegionExploredValue(): number {
     const activities = this.getRegionActivities(this.selectedRegion);
+    if(!activities) return 0;
     const activity = activities.find(a => a.civilization_id === this.civilization.id);
     if (activity) {
       return activity.explored_percent;
@@ -121,12 +133,6 @@ export class GameWorldComponent implements OnInit, OnDestroy {
       return 0
   }
 
-  onPartyAction(action: string) {
-    console.log('onPartyAction: ', action);
-    if (action === 'explore') {
-      this.selectedParty.activity = 'exploring';
-    }
-  }
 
   ngOnDestroy(): void {
     this.engine.stopEngine();
