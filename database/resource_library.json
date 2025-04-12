@@ -1,0 +1,50 @@
+[
+    {
+        "name_id": "wood",
+        "label": "Wood",
+        "resource_type": "raw",
+        "source": [],
+        "labor_pc": 1,
+        "yield_amount": 1,
+        "spawn_rate": 10,
+        "spoil_rate": 604800,
+        "techs_req": [],
+        "grow_time": 0,
+        "water_consumption": 0,
+        "img_url": "gs://post-world-app.appspot.com/wood.png"
+      },
+      {
+        "name_id": "berries",
+        "label": "Berries",
+        "resource_type": "food",
+        "source": [],
+        "labor_pc": 2,
+        "yield_amount": 3,
+        "spawn_rate": 15,
+        "spoil_rate": 172800, 
+        "techs_req": [],
+        "grow_time": 0,
+        "water_consumption": 0,
+        "img_url": "gs://post-world-app.appspot.com/berries.png"
+      },
+      {
+        "name_id": "wood_planks",
+        "label": "Wood Planks",
+        "resource_type": "material",
+        "source": [
+          {
+            "name_id": "wood",
+            "amount": 1,
+            "operator": "sum"
+          }
+        ],
+        "labor_pc": 4,
+        "yield_amount": 2,
+        "spawn_rate": 0,
+        "spoil_rate": 0,
+        "techs_req": [],
+        "grow_time": 0,
+        "water_consumption": 0,
+        "img_url": "gs://post-world-app.appspot.com/planks.png"
+      }
+]

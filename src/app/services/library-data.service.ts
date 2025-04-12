@@ -4,6 +4,7 @@ import { GameWorld, TerrainType } from '../interfaces/game-world.interface';
 import { Resource } from '../interfaces/resource.interface';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import terrainTypesLibrary from 'database/terrain_types_library.json';
+import resourceLibrary from 'database/resource_library.json';
 import { lastValueFrom } from 'rxjs';
 
 @Injectable({
@@ -26,8 +27,16 @@ export class LibraryDataService {
     
   }
 
+  updateResourcesJson() {
+    const resources: Resource[] = <Resource[]>resourceLibrary;
+    console.log('resources: ', resources);
+    this.afs.collection('libraries').doc('resources').set({ resources });
+  }
+
+  //FINISHED ADMIN SECTION
+
   getAllTerrainTypes(): Promise<TerrainType[]> {
-    // Get ALl Terrain Types from the firestore database
+    // Get All Terrain Types from the firestore database
     return lastValueFrom(this.afs.collection('libraries').doc('terrain_types').get()).then((doc) => {
       if (doc.exists) {
         const data: any = doc.data();
@@ -38,7 +47,7 @@ export class LibraryDataService {
         console.log('No such document!');
         return [];
       }
-    }).catch((error) => {
+    }).catch((error: any): TerrainType[] => {
       console.log('Error getting document:', error);
       return [];
     });
@@ -46,15 +55,21 @@ export class LibraryDataService {
 
   // Get All of the resources from resource library
   async getAllResources(): Promise<Resource[]> {
-    // return empty array until migration is done
-    return [];
-    // const promiseData = (await this.supabase.from('Resource Library').select('*')).data;
-    // if (promiseData) {
-    //   console.log('promiseData from supabase: ', promiseData);
-    //   return promiseData;
-    // } else {
-    //   throw new Error('No Resources found');
-    // }
+    // Get all resources from the firestore database
+    return lastValueFrom(this.afs.collection('libraries').doc('resources').get()).then((doc) => {
+      if (doc.exists) {
+        const data: any = doc.data();
+        console.log('resources data: ', data);
+        const resources: Resource[] = <Resource[]>data?.resources;
+        return resources;
+      } else {
+        console.log('No such document!');
+        return [];
+      }
+    }).catch((error: any): Resource[] => {
+      console.log('Error getting document:', error);
+      return [];
+    });
   }
 
   async getResource(nameId: string) {

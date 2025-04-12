@@ -1,10 +1,9 @@
 export interface Resource {
-    library_id: string;
     name_id: string;
     label: string;
-    resource_type: 'raw' | 'material' | 'food' | 'equipment';
-    source: ResourceCalc[];
-    labor_pc: number;
+    resource_type: 'raw' | 'material' | 'food' | 'equipment'; // raw materials are picked up directly from the terrain_type.
+    source?: ResourceCalc[]; // Where this resource comes from and how much of it is needed to create this resource.
+    labor_pc: number; // Labor Production cost
     yield_amount: number;
     spawn_rate: number;
     spoil_rate: number; // Number of seconds before one unit spoils.

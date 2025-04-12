@@ -117,6 +117,10 @@ export class MainMenuComponent implements OnInit {
   updateTerrainTypeJson() {
     this.library.updateTerrainTypesJson();
   }
+  updateResourcesJson() {
+    this.library.updateResourcesJson();
+  }
+  
 
 
 }
