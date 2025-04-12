@@ -38,7 +38,7 @@ export class MainMenuComponent implements OnInit {
     private GC: GameCreationService,
     private auth: AuthService,
     private firebase: FirebaseService,
-    private supabase: LibraryDataService,
+    private library: LibraryDataService,
     private router: Router,
     private engine: EngineService,
     public storage: StorageService) { }
@@ -83,7 +83,7 @@ export class MainMenuComponent implements OnInit {
     const allBuildings = await this.firebase.getAllBuildings(gameWorld.id);
     const allColonists = await this.firebase.getAllColonists(gameWorld.id);
     const playerCivilization = await this.firebase.getPlayerCivilization(gameWorld.id, this.player.player_id);
-    const resourceLibrary = await this.supabase.getAllResources();
+    const resourceLibrary = await this.library.getAllResources();
 
     this.engine.startEngine(resourceLibrary, gameWorld, playerCivilization, allContinents, allRegions,
       allParties, allPlayerActivity, allBuildings, allColonists);
@@ -110,6 +110,12 @@ export class MainMenuComponent implements OnInit {
         });
       });
     });
+  }
+
+
+  // Bellow are temporary firebase "admin" control functions
+  updateTerrainTypeJson() {
+    this.library.updateTerrainTypesJson();
   }
 
 
