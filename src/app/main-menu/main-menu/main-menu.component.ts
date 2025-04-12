@@ -7,7 +7,7 @@ import { AuthService } from 'src/app/services/auth.service';
 import { GameCreationService } from 'src/app/services/game-creation.service';
 import { HexCreationService } from 'src/app/services/hex-creation.service';
 import { NeonDataService } from 'src/app/services/neon-data.service';
-import { SupabaseService } from 'src/app/services/supabase.service';
+import { LibraryDataService } from 'src/app/services/library-data.service';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { Router } from '@angular/router';
 import { EngineService } from 'src/app/services/engine.service';
@@ -38,7 +38,7 @@ export class MainMenuComponent implements OnInit {
     private GC: GameCreationService,
     private auth: AuthService,
     private firebase: FirebaseService,
-    private supabase: SupabaseService,
+    private supabase: LibraryDataService,
     private router: Router,
     private engine: EngineService,
     public storage: StorageService) { }

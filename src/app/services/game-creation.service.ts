@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { GameWorld, createWorldObj, TerrainType } from '../interfaces/game-world.interface';
 import { AirtableService } from './airtable.service';
 import { map, take } from 'rxjs';
-import { SupabaseService } from './supabase.service';
+import { LibraryDataService } from './library-data.service';
 import { Region, createRegionObj } from '../interfaces/regions.interface';
 import { Party, createPartyObj } from '../interfaces/party.interface';
 import { Continent, createContinentsObj } from '../interfaces/continents.interface';
@@ -88,7 +88,7 @@ export class GameCreationService {
 
   terrainTypeList: TerrainType[] = [];
 
-  constructor(private airtabel: AirtableService, private supabase: SupabaseService) { }
+  constructor(private airtabel: AirtableService, private supabase: LibraryDataService) { }
 
   createWorld(player: Player, mapSize: string, mapType: string, seaLvl: string, hillLvl: string,
     forestry: string, temperature: string, rainfall: string, gameName?: string): Promise<{ world: GameWorld, civilization: Civilization }> {

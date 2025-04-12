@@ -3,7 +3,7 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { GoogleAuthProvider } from '@angular/fire/auth';
 import { Observable, firstValueFrom, of } from 'rxjs';
 import { CreatePlayer, Player } from '../interfaces/player.interface';
-import { first, map, switchMap } from 'rxjs/operators';
+import { first, map, switchMap, take } from 'rxjs/operators';
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/compat/firestore';
 import { actionCodeSettings } from 'src/environments/environment';
 import * as firebase from 'firebase/auth';
@@ -87,7 +87,7 @@ export class AuthService {
     console.log('oAuthLogin called');
     return this.afAuth.signInWithPopup(provider)
       .then((credential) => {
-        this.Player$.subscribe((user) => {
+        this.Player$.pipe(take(1)).subscribe((user) => {
           // Create New User if User is Null
           if (!user) {
             console.log('Creating a new User Profile');

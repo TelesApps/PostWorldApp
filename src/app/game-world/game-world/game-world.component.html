@@ -95,8 +95,10 @@
                             <img width="125px" src="../../../assets/images/colonist.png" alt="character image" srcset="">
                         </div>
                         <div class="party-btns">
-                            <button mat-raised-button color="primary" (click)="onPartyExplore(party)">Explore</button>
+                            <button mat-raised-button color="primary" (click)="onPartyExplore(party)">
+                                {{ party.activity === 'exploring'? 'Stop Exploring' : 'Explore' }}</button>
                             <button mat-raised-button color="primary">Settle</button>
+                            
                             <button mat-raised-button color="primary">Attack</button>
                             <button mat-raised-button color="primary">Split Party</button>
                         </div>

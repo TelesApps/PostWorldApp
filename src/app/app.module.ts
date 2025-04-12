@@ -16,7 +16,7 @@ import { GameCreationService } from './services/game-creation.service';
 import { HexCreationService } from './services/hex-creation.service';
 import { AirtableService } from './services/airtable.service';
 import { HttpClientModule } from '@angular/common/http';
-import { SupabaseService } from './services/supabase.service';
+import { LibraryDataService } from './services/library-data.service';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { ResourceUiComponent } from './components/resource-ui/resource-ui.component';
 
@@ -42,7 +42,7 @@ firebase.initializeApp(environment.firebaseConfig);
     GameCreationService,
     HexCreationService,
     AirtableService,
-    SupabaseService
+    LibraryDataService
   ],
   bootstrap: [AppComponent]
 })

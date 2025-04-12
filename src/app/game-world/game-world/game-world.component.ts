@@ -11,7 +11,7 @@ import { AuthService } from 'src/app/services/auth.service';
 import { EngineService } from 'src/app/services/engine.service';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { StorageService } from 'src/app/services/storage.service';
-import { SupabaseService } from 'src/app/services/supabase.service';
+import { LibraryDataService } from 'src/app/services/library-data.service';
 
 @Component({
   selector: 'app-game-world',
@@ -36,7 +36,7 @@ export class GameWorldComponent implements OnInit, OnDestroy {
     private auth: AuthService,
     public engine: EngineService,
     private firebase: FirebaseService,
-    private supabase: SupabaseService,
+    private supabase: LibraryDataService,
     public storage: StorageService) { }
 
   ngOnInit(): void {
@@ -50,7 +50,7 @@ export class GameWorldComponent implements OnInit, OnDestroy {
       this.gametime++;
     });
     this.playersActivitySub$ = this.engine.getAllPlayerActivity().subscribe(pa => {
-      console.log('pa: ', pa);  
+      console.log('pa: ', pa);
       this.allPlayersActivity = pa;
     });
 
@@ -115,16 +115,18 @@ export class GameWorldComponent implements OnInit, OnDestroy {
 
   onPartyExplore(party: Party) {
     const playerActivity = this.allPlayersActivity.find(pa => pa.civilization_id === this.civilization.id);
-    const partyActivity = playerActivity.parties.find(p => p.id === party.id);
-    partyActivity.activity = 'exploring';
-    partyActivity.activity_progress = playerActivity.explored_percent;
+    // const partyActivity = playerActivity.parties.find(p => p.id === party.id);
+    if (party.activity === 'exploring') {
+      party.activity = 'idle';
+    } else party.activity = 'exploring';
+    party.activity_progress = playerActivity.explored_percent;
     console.log('this.allPlayersActivity: ', this.allPlayersActivity);
     this.engine.updateAllPlayerActivity(this.allPlayersActivity);
   }
 
   getRegionExploredValue(): number {
     const activities = this.getRegionActivities(this.selectedRegion);
-    if(!activities) return 0;
+    if (!activities) return 0;
     const activity = activities.find(a => a.civilization_id === this.civilization.id);
     if (activity) {
       return activity.explored_percent;

@@ -1,5 +1,5 @@
 import { Component, HostListener, OnInit } from '@angular/core';
-import { SupabaseService } from './services/supabase.service';
+import { LibraryDataService } from './services/library-data.service';
 import { StorageService } from './services/storage.service';
 
 @Component({
@@ -22,7 +22,7 @@ export class AppComponent implements OnInit {
     this.storage.screenWidthSubj.next(this.screenWidth);
   }
   
-  constructor(private supaBase: SupabaseService, public storage: StorageService){
+  constructor(private supaBase: LibraryDataService, public storage: StorageService){
     this.screenWidth = window.innerWidth;
     this.storage.screenWidthSubj.next(this.screenWidth);
   }
