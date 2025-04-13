@@ -12,6 +12,7 @@ import { EngineService } from 'src/app/services/engine.service';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { LibraryDataService } from 'src/app/services/library-data.service';
+import { Colonist } from 'src/app/interfaces/colonist.interface';
 
 @Component({
   selector: 'app-game-world',
@@ -24,6 +25,7 @@ export class GameWorldComponent implements OnInit, OnDestroy {
   civilization: Civilization
   civSubscription$: Subscription;
   selectedSubscription$: Subscription;
+  allColonistsSubscription$: Subscription;
   allPlayersActivity: RegionPlayerActivity[];
 
   playersActivitySub$: Subscription;
@@ -31,6 +33,8 @@ export class GameWorldComponent implements OnInit, OnDestroy {
   selectedParty: Party;
   gametime = 0
   progressValue = 40;
+
+  allPlayerColonists: WritableSignal<Colonist[]> = signal<Colonist[]>([]);
 
   constructor(
     private auth: AuthService,
@@ -40,6 +44,7 @@ export class GameWorldComponent implements OnInit, OnDestroy {
     public storage: StorageService) { }
 
   ngOnInit(): void {
+    console.warn('Game World Component');
     this.loadGameState();
   }
 
@@ -53,6 +58,11 @@ export class GameWorldComponent implements OnInit, OnDestroy {
       console.log('pa: ', pa);
       this.allPlayersActivity = pa;
     });
+    this.firebase.getAllColonists("claudioteles85@gmail.com_1705161982853").then(colonists => {
+      console.log('colonists: ', colonists);
+      this.allPlayerColonists.set(colonists);
+    });
+    
 
     this.testDevelopment();
   }
@@ -67,7 +77,7 @@ export class GameWorldComponent implements OnInit, OnDestroy {
     }
     if (!this.allPlayersActivity) {
       this.firebase.getAllPlayerActivity("claudioteles85@gmail.com_1705161982853").then(pa => {
-        this.engine.updateAllPlayerActivity(pa);
+        // this.engine.updateAllPlayerActivity(pa);
         this.engine.testNextAllPlayerActivity(pa);
         console.log('this.playersActivity: ', this.allPlayersActivity);
       });
@@ -114,6 +124,14 @@ export class GameWorldComponent implements OnInit, OnDestroy {
   }
 
   onPartyExplore(party: Party) {
+    if(this.engine.isNoEngineMode) {
+      // reveal another region
+      
+      
+      return;
+    }
+
+
     const playerActivity = this.allPlayersActivity.find(pa => pa.civilization_id === this.civilization.id);
     // const partyActivity = playerActivity.parties.find(p => p.id === party.id);
     if (party.activity === 'exploring') {

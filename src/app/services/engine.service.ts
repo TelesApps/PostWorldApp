@@ -15,6 +15,11 @@ import { Resource } from '../interfaces/resource.interface';
 })
 export class EngineService {
 
+  // No engine mode is used to avoid deleting logic to make this into an actual web game
+  // For the most part though we will not need to look at this
+  public isNoEngineMode: boolean = true;
+
+
   private worker: Worker;
   private gameSpeedMultiplier: number = .25; // Default to normal speed
 

@@ -85,6 +85,10 @@ export class MainMenuComponent implements OnInit {
     const playerCivilization = await this.firebase.getPlayerCivilization(gameWorld.id, this.player.player_id);
     const resourceLibrary = await this.library.getAllResources();
 
+    if(this.engine.isNoEngineMode) {
+      this.router.navigate(['/game-world']);
+      return;
+    }
     this.engine.startEngine(resourceLibrary, gameWorld, playerCivilization, allContinents, allRegions,
       allParties, allPlayerActivity, allBuildings, allColonists);
     this.router.navigate(['/game-world']);

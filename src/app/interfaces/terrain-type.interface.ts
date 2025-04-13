@@ -1,4 +1,4 @@
-
+// See README file for full description of these values
 export interface TerrainType {
     id: number;
     name: string;
@@ -12,3 +12,5 @@ export interface TerrainType {
     possible_temperature_lvl: number[];
     possible_rainfall_lvl: number[];
 }
+
+

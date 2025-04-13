@@ -6,6 +6,14 @@
                 <div *ngIf="civilization.explored_perspective !== null">{{civilization.explored_perspective}}%</div>
                 Game Time/Date {{ gametime }}
             </div>
+            <div class="total-colonists">
+                <div>Total Colonists</div>
+                <div>
+                    {{ allPlayerColonists().length }}
+                    <!-- 'mat-button','mat-raised-button', 'mat-flat-button','mat-stroked-button','mat-icon-button','mat-fab','mat-mini-fab' -->
+                    <button mat-mini-fab color="primary"><mat-icon>add</mat-icon></button>
+                </div>
+            </div>
             <div class="civ-resources">
                 <div>Resources being tracked</div>
                 <mat-icon aria-hidden="false" aria-label="Example home icon">menu</mat-icon>
