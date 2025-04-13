@@ -73,6 +73,20 @@ export class LibraryDataService {
   }
 
   async getResource(nameId: string) {
+    if (this.resources_cashe.has(nameId)) {
+      return this.resources_cashe.get(nameId);
+    } else {
+      console.warn('Resource not found in cache, fetching from database');
+      const resources = await this.getAllResources();
+      const resource = resources.find((resource) => resource.name_id === nameId);
+      if (resource) {
+        this.resources_cashe.set(nameId, resource);
+        return resource;
+      } else {
+        console.log('Resource not found in database');
+        return null;
+      }
+    }
     
   }
 

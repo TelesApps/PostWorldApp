@@ -11,7 +11,7 @@
         "techs_req": [],
         "grow_time": 0,
         "water_consumption": 0,
-        "img_url": "gs://post-world-app.appspot.com/wood.png"
+        "img_url": "wood.png"
       },
       {
         "name_id": "berries",
@@ -25,7 +25,7 @@
         "techs_req": [],
         "grow_time": 0,
         "water_consumption": 0,
-        "img_url": "gs://post-world-app.appspot.com/berries.png"
+        "img_url": "berries.png"
       },
       {
         "name_id": "wood_planks",
@@ -45,6 +45,6 @@
         "techs_req": [],
         "grow_time": 0,
         "water_consumption": 0,
-        "img_url": "gs://post-world-app.appspot.com/planks.png"
+        "img_url": "planks.png"
       }
 ]

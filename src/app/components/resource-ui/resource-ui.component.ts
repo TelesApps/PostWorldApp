@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { LibraryDataService } from 'src/app/services/library-data.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-resource-ui',
@@ -19,27 +20,27 @@ export class ResourceUiComponent implements OnInit {
 
   imgUrl: string = '';
 
-  constructor(private supabase: LibraryDataService) { }
+  constructor(private library: LibraryDataService) { }
 
   ngOnInit(): void {
     this.setResource();
   }
 
   async setResource() {
-  //   if (this.nameId) {
-  //     const resource = await this.supabase.getResource(this.nameId);
-  //     if (resource) {
-  //       if (resource.img_url) {
-  //         this.imgUrl = resource.img_url;
-  //       } else {
-  //         this.imgUrl = this.placeholder;
-  //       }
-  //       if(resource.label) {
-  //         this.tooltip = resource.label;
-  //         this.alt = resource.label;
-  //       }
-  //     }
-  //   }
+    if (this.nameId) {
+      const resource = await this.library.getResource(this.nameId);
+      if (resource) {
+        if (resource.img_url) {
+          this.imgUrl = environment.firebaseStorageUrl + resource.img_url + '?alt=media';
+        } else {
+          this.imgUrl = this.placeholder;
+        }
+        if(resource.label) {
+          this.tooltip = resource.label;
+          this.alt = resource.label;
+        }
+      }
+    }
   }
 
 }
